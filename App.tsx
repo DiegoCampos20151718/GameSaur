@@ -6,12 +6,12 @@ import DocumentData from './assets/Icons/DocumentData';
 import LightBulbPerson from './assets/Icons/LightbulbPerson';
 import Rocket from './assets/Icons/Rocket';
 import Logo from './assets/Icons/Logo';
-import Login from './components/Login';
+import Register from './components/Register';
 
 export default function App() {
   return (
     <GluestackUIProvider config={config}>
-      <Login />
+      <Register />
     </GluestackUIProvider>
   );
 }

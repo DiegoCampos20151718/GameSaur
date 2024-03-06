@@ -5,6 +5,7 @@ import { StyleSheet, View, Text, TextInput, TouchableOpacity } from 'react-nativ
 
 const Login = () => {
   return (
+    
     <View style={styles.container}>
       <Image source={require('../assets/logo.png')} style={styles.logo} />
       <Text style={styles.loginText}>Login</Text>
@@ -28,7 +29,7 @@ const Login = () => {
         </TouchableOpacity>
       </View>
       <TouchableOpacity>
-        <Text style={styles.signUpText}>¿No tienes cuenta? Haz click aquí</Text>
+        <Text style={styles.signUpText}>Don't have an account? Click here</Text>
       </TouchableOpacity>
     </View>
   );

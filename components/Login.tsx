@@ -1,96 +1,66 @@
 import React from 'react';
-import { Image } from 'react-native';
 import { config } from '@gluestack-ui/config';
-import { StyleSheet, View, Text, TextInput, TouchableOpacity } from 'react-native';
+import { ButtonIcon, ButtonGroup, AddIcon, InfoIcon, ButtonSpinner, ArrowUpIcon, ThreeDotsIcon } from '@gluestack-ui/themed';
+import { FormControlLabel, FormControlLabelText, FormControlHelper, FormControlHelperText, FormControlError, FormControlErrorIcon, Input, InputField, Radio, RadioGroup, RadioIcon, RadioIndicator, RadioLabel, Button, ButtonText, Checkbox, CheckboxGroup, CheckboxIndicator, CheckboxIcon, CheckboxLabel, Textarea, TextareaInput, Select, SelectTrigger, SelectInput, SelectIcon, SelectPortal, SelectBackdrop, SelectContent, SelectDragIndicatorWrapper, SelectDragIndicator, SelectItem, Slider, SliderTrack, SliderFilledTrack, SliderThumb, Switch, Modal, ModalBackdrop, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, HStack, Center, Icon, CircleIcon, CheckIcon, AlertCircleIcon } from '@gluestack-ui/themed';
+import { Box, GluestackUIProvider, Text, Image, VStack, Heading, Link, Accordion, AccordionHeader, AccordionItem, AccordionContentText, AccordionContent, AccordionTrigger, AccordionTitleText, AccordionIcon, ChevronUpIcon, ChevronDownIcon, FormControl } from '@gluestack-ui/themed';
+import { FormControlErrorText } from "@gluestack-ui/themed";
 
 const Login = () => {
   return (
-    
-    <View style={styles.container}>
-      <Image source={require('../assets/logo.png')} style={styles.logo} />
-      <Text style={styles.loginText}>Login</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="e-mail"
-        placeholderTextColor="#9B9B9B"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        placeholderTextColor="#9B9B9B"
-        secureTextEntry
-      />
-      <TouchableOpacity style={styles.loginButton}>
-        <Text style={styles.loginButtonText}>Login</Text>
-      </TouchableOpacity>
-      <View style={styles.keepSessionContainer}>
-        <TouchableOpacity>
-          <Text style={styles.keepSessionText}>Keep open the session</Text>
-        </TouchableOpacity>
-      </View>
-      <TouchableOpacity>
-        <Text style={styles.signUpText}>Don't have an account? Click here</Text>
-      </TouchableOpacity>
-    </View>
+    // Ajuste aquí para hacer el Center más grande
+    <Center style={{ marginTop: '20px', width: '100%', height: '100vh' }}> 
+      <VStack>
+        <FormControl size={"lg"} isDisabled={false} isRequired={true}>
+          <FormControlLabel>
+            <FormControlLabelText>Email</FormControlLabelText>
+          </FormControlLabel>
+          <Input isFocused={false} $focus-borderColor='$purple500'>
+            <InputField type="text" defaultValue="ej@gmail.com" placeholder="email"/>
+          </Input>
+
+          <FormControlHelper>
+            <FormControlHelperText>
+            </FormControlHelperText>
+          </FormControlHelper>
+
+          <FormControlError>
+            <FormControlErrorIcon as={AlertCircleIcon} />
+            <FormControlErrorText>
+              At least 6 characters are required.
+            </FormControlErrorText>
+          </FormControlError>
+        </FormControl>
+
+        <FormControl size={"md"} isDisabled={false} isRequired={true}>
+          <FormControlLabel>
+            <FormControlLabelText>Password</FormControlLabelText>
+          </FormControlLabel>
+          <Input>
+            <InputField type="password" defaultValue="12345" placeholder="password"/>
+          </Input>
+
+          <FormControlHelper>
+            <FormControlHelperText>
+              Must be at least 6 characters.
+            </FormControlHelperText>
+          </FormControlHelper>
+
+          <FormControlError>
+            <FormControlErrorIcon as={AlertCircleIcon} />
+            <FormControlErrorText>
+              At least 6 characters are required.
+            </FormControlErrorText>
+          </FormControlError>
+        </FormControl>
+
+        <Button action={"primary"} variant={"solid"} size={"lg"} isDisabled={false} bg='$purple400'>
+          <ButtonText>
+            Button
+          </ButtonText>
+        </Button>
+      </VStack>
+    </Center>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F5F5F5',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  logo: {
-    width: 150,
-    height: 150,
-    marginBottom: 10,
-  },
-  appName: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#007AFF',
-    marginBottom: 20,
-  },
-  loginText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
-  input: {
-    width: '80%',
-    height: 40,
-    borderColor: '#007AFF',
-    borderWidth: 1,
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    marginBottom: 10,
-  },
-  loginButton: {
-    width: '80%',
-    height: 40,
-    backgroundColor: '#007AFF',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 5,
-    marginBottom: 10,
-  },
-  loginButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  keepSessionContainer: {
-    flexDirection: 'row',
-    marginBottom: 10,
-  },
-  keepSessionText: {
-    color: '#007AFF',
-  },
-  signUpText: {
-    color: '#007AFF',
-  },
-});
 
 export default Login;

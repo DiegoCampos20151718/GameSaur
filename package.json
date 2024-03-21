@@ -19,6 +19,8 @@
     "@react-navigation/native-stack": "^6.9.20",
     "expo": "^50.0.3",
     "expo-status-bar": "~1.11.1",
+    "gluestack": "^0.1.1",
+    "gluestack-ui": "^0.5.2",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-native": "0.73.2",

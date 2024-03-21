@@ -7,11 +7,12 @@ import LightBulbPerson from './assets/Icons/LightbulbPerson';
 import Rocket from './assets/Icons/Rocket';
 import Logo from './assets/Icons/Logo';
 import Register from './components/Register';
+import Login from './components/Login';
 
 export default function App() {
   return (
     <GluestackUIProvider config={config}>
-      <Register />
+      <Login />
     </GluestackUIProvider>
   );
 }

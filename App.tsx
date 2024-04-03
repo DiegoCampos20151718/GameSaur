@@ -1,23 +1,21 @@
 import React from 'react';
-import { config } from '@gluestack-ui/config';
-import { Box, GluestackUIProvider, Text } from '@gluestack-ui/themed';
-import { ScrollView } from 'react-native';
-import Gradient from './assets/Icons/Gradient';
-import DocumentData from './assets/Icons/DocumentData';
-import LightBulbPerson from './assets/Icons/LightbulbPerson';
-import Rocket from './assets/Icons/Rocket';
-import Logo from './assets/Icons/Logo';
-import Register from './components/Register';
-import Login from './components/Login';
-import Home from './components/Home';
-import { Ionicons } from '@expo/vector-icons';
 import { NavigationContainer } from '@react-navigation/native';
+import { createDrawerNavigator } from '@react-navigation/drawer';
+import LoginScreen from './components/Login'; // Adjust the path as necessary
+import Register from './components/Register'; // Adjust the path as necessary
+import Home from './components/Home';
+const Drawer = createDrawerNavigator();
 
-export default function App() {
+const App = () => {
   return (
     <NavigationContainer>
-      <Home />
+      <Drawer.Navigator initialRouteName="Home">
+        <Drawer.Screen name="Home" component={Home} />
+        <Drawer.Screen name="Login" component={LoginScreen} />
+        <Drawer.Screen name="Register" component={Register} />
+      </Drawer.Navigator>
     </NavigationContainer>
   );
-}
+};
 
+export default App;

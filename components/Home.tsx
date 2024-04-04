@@ -2,6 +2,8 @@ import React from 'react';
 import { View, Text, ScrollView, Image, ImageSourcePropType, StyleSheet } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
+import WishList from '../components/WishList';
+import ShoppingCartView from '../components/Cart';
 
 interface Props { }
 
@@ -34,7 +36,7 @@ class HomeView extends React.Component<Props, State> {
               resizeMode="cover"
             />
           </View>
-          <br />
+          
           <Text style={styles.sectionHeader}>Marcas</Text>
           <View style={{ alignItems: 'center' }}>
             <Image
@@ -43,7 +45,7 @@ class HomeView extends React.Component<Props, State> {
               resizeMode="cover"
             />
           </View>
-          <br />
+          
           <Text style={styles.sectionHeader}>Destacados</Text>
           <ScrollView horizontal={true}>
             <View style={{ flexDirection: 'row' }}>
@@ -121,7 +123,7 @@ const styles = StyleSheet.create({
   price: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#FF23FF',
+    color: '#000',
     marginLeft: 8,
   },
   sectionHeader: {
@@ -132,7 +134,6 @@ const styles = StyleSheet.create({
   },
 });
 
-// Create a bottom tab navigator
 const Tab = createBottomTabNavigator();
 
 // Main component containing bottom tab navigator
@@ -152,23 +153,33 @@ class MainScreen extends React.Component {
           }}
         />
         <Tab.Screen
-          name="Home2"
-          component={HomeView}
+          name="Cart"
+          component={ShoppingCartView}
           options={{
             tabBarIcon: ({ color, size }) => (
-              <Ionicons name="home" color={color} size={25} />
+              <Ionicons name="cart" color={color} size={25} />
             ),
           }}
         />
         <Tab.Screen
-          name="Home3"
-          component={HomeView}
+          name="WishList"
+          component={WishList}
           options={{
             tabBarIcon: ({ color, size }) => (
-              <Ionicons name="home" color={color} size={25} />
+              <Ionicons name="bookmark" color={color} size={25} />
             ),
           }}
         />
+        <Tab.Screen
+          name="Sell Games"
+          component={HomeView}
+          options={{
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons name="pricetag" color={color} size={25} />
+            ),
+          }}
+        />
+        
       </Tab.Navigator>
     );
   }

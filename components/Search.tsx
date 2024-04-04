@@ -6,32 +6,32 @@ interface Product {
     id: number;
     title: string;
     price: number;
-    image: string;
+    image: any;
   }
 const data = [
   {
     id: 1,
     title: 'Halo Infinite Xbox Series X Limited Edition Steelbook Edition',
     price: 3750.0,
-    image: 'https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.amazon.com.mx%2FHalo-Infinite-Standard-Xbox-X%2Fdp%2FB09DRCGDJD&psig=AOvVaw1q59P3yKkrILEDUF0fBHND&ust=1712275287373000&source=images&cd=vfe&opi=89978449&ved=0CBIQjRxqFwoTCJCZ_9Ogp4UDFQAAAAAdAAAAABAE',
+    image: require('../assets/images/haloinfinite.jpg'),
   },
   {
     id: 2,
-    title: 'God of war Ragnarok',
+    title: 'Pokemon',
     price: 3199.0,
-    image: 'https://example.com/god-of-war.jpg',
+    image: require('../assets/images/pokemon.jpg'),
   },
   {
     id: 3,
-    title: 'Consola PlayStation5 version estandar',
+    title: 'Kirby',
     price: 10199.0,
-    image: 'https://example.com/playstation5.jpg',
+    image: require('../assets/images/kirby.jpg'),
   },
   {
     id: 4,
-    title: 'Halo Infinite Xbox Series X Limited Edition Steelbook Edition',
+    title: 'Spiderman',
     price: 3750.0,
-    image: 'https://example.com/halo-infinite.jpg',
+    image: require('../assets/images/spiderman.jpg'),
   },
 ];
 

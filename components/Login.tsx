@@ -1,7 +1,11 @@
 import React from 'react';
 import { StyleSheet, View, Text, TextInput, TouchableOpacity, Image } from 'react-native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createDrawerNavigator } from '@react-navigation/drawer';
+import { NavigationContainer } from '@react-navigation/native';
+import Registration from './Register';
 
-const LoginScreen = () => {
+const LoginScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <Image source={require('../assets/logo.png')} style={styles.logo} />
@@ -19,7 +23,7 @@ const LoginScreen = () => {
         secureTextEntry
       />
       <TouchableOpacity style={styles.loginButton}>
-        <Text style={styles.loginButtonText}>Login</Text>
+        <Text style={styles.loginButtonText} onPress={() => navigation.navigate('Home')}>Login</Text>
       </TouchableOpacity>
       <View style={styles.keepSessionContainer}>
         <TouchableOpacity>
@@ -27,7 +31,7 @@ const LoginScreen = () => {
         </TouchableOpacity>
       </View>
       <TouchableOpacity>
-        <Text style={styles.signUpText}>Don't have an account? Click here</Text>
+        <Text style={styles.signUpText} onPress={() => navigation.navigate('Register')}>Don't have an account? Click here</Text>
       </TouchableOpacity>
     </View>
   );

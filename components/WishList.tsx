@@ -26,7 +26,7 @@ const WishlistView: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Lista de deseos</Text>
+      <Text style={styles.title}>Wish List</Text>
       <ScrollView>
         {videojuegosDeseados.map((videojuego, index) => (
           <View key={index} style={styles.card}>
@@ -40,7 +40,7 @@ const WishlistView: React.FC = () => {
               <Text style={styles.price}>${videojuego.precio}</Text>
             </View>
             <TouchableOpacity style={styles.removeButton} onPress={() => removerDeWishlist(videojuego)}>
-              <Text style={styles.removeButtonText}>Quitar</Text>
+              <Text style={styles.removeButtonText}>Remove</Text>
             </TouchableOpacity>
           </View>
         ))}

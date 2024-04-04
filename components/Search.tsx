@@ -46,7 +46,7 @@ const App = () => {
   
     return (
       <View style={styles.container}>
-        <TextInput style={styles.searchInput} placeholder="Buscar" />
+        <TextInput style={styles.searchInput} placeholder="Search" />
         <FlatList
           data={data}
           renderItem={renderItem}

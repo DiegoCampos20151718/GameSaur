@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, ScrollView, Image, ImageSourcePropType, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, Image, ImageSourcePropType, StyleSheet, TextInput } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import WishList from '../components/WishList';
@@ -29,6 +29,7 @@ class HomeView extends React.Component<Props, State> {
     return (
       <View style={styles.container}>
         <ScrollView>
+        <TextInput style={styles.searchInput} placeholder="Search" />
           <View style={{ alignItems: 'center' }}>
             <Image
               source={require('../assets/images/banner.png')}
@@ -37,7 +38,7 @@ class HomeView extends React.Component<Props, State> {
             />
           </View>
           
-          <Text style={styles.sectionHeader}>Marcas</Text>
+          <Text style={styles.sectionHeader}>Brands</Text>
           <View style={{ alignItems: 'center' }}>
             <Image
               source={require('../assets/images/brands.png')}
@@ -46,7 +47,7 @@ class HomeView extends React.Component<Props, State> {
             />
           </View>
           
-          <Text style={styles.sectionHeader}>Destacados</Text>
+          <Text style={styles.sectionHeader}>Featured</Text>
           <ScrollView horizontal={true}>
             <View style={{ flexDirection: 'row' }}>
               <View style={{ paddingRight: 16 }}>
@@ -69,7 +70,7 @@ class HomeView extends React.Component<Props, State> {
               </View>
             </View>
           </ScrollView>
-          <Text style={styles.sectionHeader}>Ofertas</Text>
+          <Text style={styles.sectionHeader}>Offers</Text>
           <ScrollView horizontal={true}>
             <View style={{ flexDirection: 'row' }}>
               <View style={{ paddingRight: 16 }}>
@@ -102,6 +103,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     margin: 16,
+  },
+  searchInput: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 4,
+    padding: 8,
+    marginBottom: 16,
   },
   imageContainer: {
     marginRight: 16,

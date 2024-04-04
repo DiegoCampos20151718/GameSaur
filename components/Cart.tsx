@@ -36,7 +36,7 @@ const ShoppingCartView: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Carrito de Compras</Text>
+      <Text style={styles.title}>Shopping Cart</Text>
       <ScrollView>
         {cartItems.map((item, index) => (
           <ShoppingCartItem key={index} productName={item.nombre} price={item.precio} image={item.imagen} />
@@ -45,7 +45,7 @@ const ShoppingCartView: React.FC = () => {
       <View style={styles.bottomBar}>
         <Text style={styles.totalText}>Total: ${calculateTotal().toFixed(2)}</Text>
         <TouchableOpacity style={styles.proceedButton} onPress={() => {}}>
-          <Text style={styles.buttonText}>Proceder al Pago</Text>
+          <Text style={styles.buttonText}>Proceed to Payment</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -62,14 +62,14 @@ const ShoppingCartItem: React.FC<CartItem> = ({ productName, price, image }) => 
         <Text style={styles.itemName}>{productName}</Text>
         <Text style={styles.itemPrice}>${price.toFixed(2)}</Text>
         <View style={styles.quantityContainer}>
-          <Text>Cantidad: </Text>
+          <Text>Amount: </Text>
           <TouchableOpacity onPress={() => setQuantity(quantity + 1)}>
             <Text>{quantity}</Text>
           </TouchableOpacity>
         </View>
       </View>
       <TouchableOpacity style={styles.removeButton} onPress={() => {}}>
-        <Text style={styles.buttonText}>Eliminar</Text>
+        <Text style={styles.buttonText}>Delete</Text>
       </TouchableOpacity>
     </View>
   );

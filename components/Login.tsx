@@ -27,7 +27,7 @@ const LoginScreen = () => {
         </TouchableOpacity>
       </View>
       <TouchableOpacity>
-        <Text style={styles.signUpText}>¿No tienes cuenta? Haz click aquí</Text>
+        <Text style={styles.signUpText}>Don't have an account? Click here</Text>
       </TouchableOpacity>
     </View>
   );

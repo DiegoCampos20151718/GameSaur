@@ -1,11 +1,32 @@
-import React from 'react';
-import { StyleSheet, View, Text, TextInput, TouchableOpacity, Image } from 'react-native';
+import React,{useState} from 'react';
+import { StyleSheet, View, Text, TextInput, TouchableOpacity, Image, Alert } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { NavigationContainer } from '@react-navigation/native';
 import Registration from './Register';
 
 const LoginScreen = ({ navigation }) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const validateEmail = (email) => {
+    const re = /\S+@\S+\.\S+/;
+    return re.test(email);
+  };
+
+  const handleLogin = () => {
+    if (!email || !password) {
+      Alert.alert('Error', 'Please fill in all fields');
+      return;
+    }
+    if (!validateEmail(email)) {
+      Alert.alert('Error', 'Please enter a valid email');
+      return;
+    }
+    // If all validations pass, navigate to Home or perform your login logic
+    navigation.navigate('Home');
+  };
+
   return (
     <View style={styles.container}>
       <Image source={require('../assets/logo.png')} style={styles.logo} />
@@ -15,15 +36,19 @@ const LoginScreen = ({ navigation }) => {
         style={styles.input}
         placeholder="e-mail"
         placeholderTextColor="#9B9B9B"
+        value={email}
+        onChangeText={setEmail}
       />
       <TextInput
         style={styles.input}
         placeholder="Password"
         placeholderTextColor="#9B9B9B"
         secureTextEntry
+        value={password}
+        onChangeText={setPassword}
       />
-      <TouchableOpacity style={styles.loginButton}>
-        <Text style={styles.loginButtonText} onPress={() => navigation.navigate('Home')}>Login</Text>
+      <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
+        <Text style={styles.loginButtonText}>Login</Text>
       </TouchableOpacity>
       <View style={styles.keepSessionContainer}>
         <TouchableOpacity>
@@ -31,7 +56,9 @@ const LoginScreen = ({ navigation }) => {
         </TouchableOpacity>
       </View>
       <TouchableOpacity>
-        <Text style={styles.signUpText} onPress={() => navigation.navigate('Register')}>Don't have an account? Click here</Text>
+        <Text style={styles.signUpText} onPress={() => navigation.navigate('Register')}>
+          Don't have an account? Click here
+        </Text>
       </TouchableOpacity>
     </View>
   );

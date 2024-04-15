@@ -1,9 +1,10 @@
-import React,{useState} from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, View, Text, TextInput, TouchableOpacity, Image, Alert } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { NavigationContainer } from '@react-navigation/native';
 import Registration from './Register';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
@@ -12,6 +13,32 @@ const LoginScreen = ({ navigation }) => {
   const validateEmail = (email) => {
     const re = /\S+@\S+\.\S+/;
     return re.test(email);
+  };
+
+  const authenticateUser = async (email, password) => {
+    try {
+      const response = await fetch('http://localhost/geingeemu/public/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: email,
+          password: password,
+        }),
+      });
+      const json = await response.json();
+      if (json.success) {
+        // Navigate to Home screen or store token in AsyncStorage
+        navigation.navigate('Home');
+      } else {
+        // Handle failed login
+        Alert.alert('Login Failed', json.message || 'Invalid credentials');
+      }
+    } catch (error) {
+      console.error('Login Error:', error);
+      Alert.alert('Login Error', 'Unable to connect to the server');
+    }
   };
 
   const handleLogin = () => {
@@ -23,8 +50,8 @@ const LoginScreen = ({ navigation }) => {
       Alert.alert('Error', 'Please enter a valid email');
       return;
     }
-    // If all validations pass, navigate to Home or perform your login logic
-    navigation.navigate('Home');
+    // Asynchronous authentication
+    authenticateUser(email, password);
   };
 
   return (

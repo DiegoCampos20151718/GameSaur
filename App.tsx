@@ -5,6 +5,7 @@ import LoginScreen from './components/Login'; // Adjust the path as necessary
 import Register from './components/Register'; // Adjust the path as necessary
 import Home from './components/Home';
 import Search from './components/Search';
+import ProdInfo from './components/ProdInfo';
 const Drawer = createDrawerNavigator();
 
 const App = () => {
@@ -15,6 +16,7 @@ const App = () => {
         <Drawer.Screen name="Login" component={LoginScreen} />
         <Drawer.Screen name="Register" component={Register} />
         <Drawer.Screen name="Search" component={Search} />
+        <Drawer.Screen name="ProdInfo" component={ProdInfo} />
       </Drawer.Navigator>
     </NavigationContainer>
   );

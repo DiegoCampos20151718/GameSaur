@@ -1,102 +1,103 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, Image, ImageSourcePropType, StyleSheet, TextInput } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import WishList from '../components/WishList';
 import ShoppingCartView from '../components/Cart';
 
-interface Props { }
+type JsonPlaceholder = {
+  id: string;
+  name: string;
+  image: string;
+  description: string;
+  price: number;
+}
 
-interface State { }
+const fetchData = async () => {
+  const response = await fetch('http://localhost/geingeemu/public/api/videogame_index');
+  return await response.json();
+}
 
-class HomeView extends React.Component<Props, State> {
-  _buildImageWithText(imagePath: ImageSourcePropType, text: string, textP: string) {
-    return (
-      <View style={styles.imageContainer}>
-        <Image
-          source={imagePath}
-          style={styles.image}
-        />
-        <View style={styles.textContainer}>
-          <Text style={styles.productName}>{text}</Text>
-          <Text style={styles.price}>{textP}</Text>
-        </View>
+const HomeView = ({ data }: { data: JsonPlaceholder[] }) => {
+  const _buildImageWithText = (imagePath: ImageSourcePropType, text: string, textP: string) => (
+    <View style={styles.imageContainer}>
+      <Image
+        source={{ uri: imagePath }}
+        style={styles.image}
+      />
+      <View style={styles.textContainer}>
+        <Text style={styles.productName}>{text}</Text>
+        <Text style={styles.price}>{textP}</Text>
       </View>
-    );
-  }
+    </View>
+  );
 
-  render() {
-    return (
-      <View style={styles.container}>
-        <ScrollView>
+  return (
+    <View style={styles.container}>
+      <ScrollView>
         <TextInput style={styles.searchInput} placeholder="Search" />
-          <View style={{ alignItems: 'center' }}>
-            <Image
-              source={require('../assets/images/banner.png')}
-              style={{ width: '100%', height: 130 }}
-              resizeMode="cover"
-            />
+        <Text style={styles.sectionHeader}>Featured</Text>
+        <ScrollView horizontal={true}>
+          <View style={{ flexDirection: 'row' }}>
+            {data.map(item => (
+              <View style={{ paddingRight: 16 }} key={item.id}>
+                {_buildImageWithText(item.image, item.name, `$${item.price}`)}
+              </View>
+            ))}
           </View>
-          
-          <Text style={styles.sectionHeader}>Brands</Text>
-          <View style={{ alignItems: 'center' }}>
-            <Image
-              source={require('../assets/images/brands.png')}
-              style={{ width: '100%', height: 110 }}
-              resizeMode="cover"
-            />
-          </View>
-          
-          <Text style={styles.sectionHeader}>Featured</Text>
-          <ScrollView horizontal={true}>
-            <View style={{ flexDirection: 'row' }}>
-              <View style={{ paddingRight: 16 }}>
-                {this._buildImageWithText(require('../assets/images/halo4.jpg'), 'Halo 4', '$1000.00')}
-              </View>
-              <View style={{ paddingRight: 16 }}>
-                {this._buildImageWithText(require('../assets/images/halo5.jpg'), 'Halo 5', '$1000.00')}
-              </View>
-              <View style={{ paddingRight: 16 }}>
-                {this._buildImageWithText(require('../assets/images/haloinfinite.jpg'), 'Halo Infinite', '$1000.00')}
-              </View>
-              <View style={{ paddingRight: 16 }}>
-                {this._buildImageWithText(require('../assets/images/kirby.jpg'), 'Kirby and the forgotten lands', '$1000.00')}
-              </View>
-              <View style={{ paddingRight: 16 }}>
-                {this._buildImageWithText(require('../assets/images/zelda.jpg'), 'Zelda: TOTK', '$1000.00')}
-              </View>
-              <View style={{ paddingRight: 16 }}>
-                {this._buildImageWithText(require('../assets/images/pokemon.jpg'), 'Pokemon Scarlet', '$1000.00')}
-              </View>
-            </View>
-          </ScrollView>
-          <Text style={styles.sectionHeader}>Offers</Text>
-          <ScrollView horizontal={true}>
-            <View style={{ flexDirection: 'row' }}>
-              <View style={{ paddingRight: 16 }}>
-                {this._buildImageWithText(require('../assets/images/kirby.jpg'), 'Kirby and the forgotten lands', '$1000.00')}
-              </View>
-              <View style={{ paddingRight: 16 }}>
-                {this._buildImageWithText(require('../assets/images/zelda.jpg'), 'Zelda: TOTK', '$1000.00')}
-              </View>
-              <View style={{ paddingRight: 16 }}>
-                {this._buildImageWithText(require('../assets/images/pokemon.jpg'), 'Pokemon Scarlet', '$1000.00')}
-              </View>
-              <View style={{ paddingRight: 16 }}>
-                {this._buildImageWithText(require('../assets/images/halo4.jpg'), 'Halo 4', '$1000.00')}
-              </View>
-              <View style={{ paddingRight: 16 }}>
-                {this._buildImageWithText(require('../assets/images/halo5.jpg'), 'Halo 5', '$1000.00')}
-              </View>
-              <View style={{ paddingRight: 16 }}>
-                {this._buildImageWithText(require('../assets/images/haloinfinite.jpg'), 'Halo Infinite', '$1000.00')}
-              </View>
-            </View>
-          </ScrollView>
         </ScrollView>
-      </View>
-    );
-  }
+      </ScrollView>
+    </View>
+  );
+}
+
+const MainScreen = () => {
+  const [data, setData] = useState<JsonPlaceholder[]>([]);
+
+  useEffect(() => {
+    fetchData().then(setData);
+  }, []);
+
+  return (
+    <Tab.Navigator screenOptions={{ headerShown: false }}>
+      <Tab.Screen
+        name="Home"
+        children={() => <HomeView data={data} />}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="home" color={color} size={25} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Cart"
+        component={ShoppingCartView}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="cart" color={color} size={25} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="WishList"
+        component={WishList}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="bookmark" color={color} size={25} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Sell Games"
+        component={HomeView}  // Assume this component similarly needs data
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="pricetag" color={color} size={25} />
+          ),
+        }}
+      />
+    </Tab.Navigator>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -121,7 +122,6 @@ const styles = StyleSheet.create({
   },
   textContainer: {
     marginTop: 8,
-
     alignItems: 'baseline',
   },
   productName: {
@@ -143,54 +143,5 @@ const styles = StyleSheet.create({
 });
 
 const Tab = createBottomTabNavigator();
-
-// Main component containing bottom tab navigator
-class MainScreen extends React.Component {
-  render() {
-    return (
-      <Tab.Navigator
-        screenOptions={{ headerShown: false }}
-      >
-        <Tab.Screen
-          name="Home"
-          component={HomeView}
-          options={{
-            tabBarIcon: ({ color, size }) => (
-              <Ionicons name="home" color={color} size={25} />
-            ),
-          }}
-        />
-        <Tab.Screen
-          name="Cart"
-          component={ShoppingCartView}
-          options={{
-            tabBarIcon: ({ color, size }) => (
-              <Ionicons name="cart" color={color} size={25} />
-            ),
-          }}
-        />
-        <Tab.Screen
-          name="WishList"
-          component={WishList}
-          options={{
-            tabBarIcon: ({ color, size }) => (
-              <Ionicons name="bookmark" color={color} size={25} />
-            ),
-          }}
-        />
-        <Tab.Screen
-          name="Sell Games"
-          component={HomeView}
-          options={{
-            tabBarIcon: ({ color, size }) => (
-              <Ionicons name="pricetag" color={color} size={25} />
-            ),
-          }}
-        />
-        
-      </Tab.Navigator>
-    );
-  }
-}
 
 export default MainScreen;

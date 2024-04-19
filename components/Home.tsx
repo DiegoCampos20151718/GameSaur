@@ -20,15 +20,13 @@ const fetchData = async () => {
 }
 
 const HomeView = ({ data }: { data: JsonPlaceholder[] }) => {
+  const [searchQuery, setSearchQuery] = useState('');
   const navigation = useNavigation();
 
   const _buildImageWithText = (imagePath: ImageSourcePropType, text: string, textP: string, onPress: () => void) => (
     <TouchableOpacity onPress={onPress}>
       <View style={styles.imageContainer}>
-        <Image
-          source={{ uri: imagePath }}
-          style={styles.image}
-        />
+        <Image source={{ uri: imagePath }} style={styles.image} />
         <View style={styles.textContainer}>
           <Text style={styles.productName}>{text}</Text>
           <Text style={styles.price}>{textP}</Text>
@@ -37,14 +35,23 @@ const HomeView = ({ data }: { data: JsonPlaceholder[] }) => {
     </TouchableOpacity>
   );
 
+  const filteredData = data.filter(item =>
+    item.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <View style={styles.container}>
       <ScrollView>
-        <TextInput style={styles.searchInput} placeholder="Search" />
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search"
+          onChangeText={setSearchQuery}
+          value={searchQuery}
+        />
         <Text style={styles.sectionHeader}>Featured</Text>
         <ScrollView horizontal={true}>
           <View style={{ flexDirection: 'row' }}>
-            {data.map(item => (
+            {filteredData.map(item => (
               <View style={{ paddingRight: 16 }} key={item.id}>
                 {_buildImageWithText(item.image, item.name, `$${item.price}`, () => {
                   navigation.navigate('ProdInfo', { item });

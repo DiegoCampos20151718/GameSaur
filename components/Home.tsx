@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, Image, ImageSourcePropType, StyleSheet, TextInput } from 'react-native';
+import { View, Text, ScrollView, Image, ImageSourcePropType, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 import WishList from '../components/WishList';
 import ShoppingCartView from '../components/Cart';
 
@@ -19,17 +20,21 @@ const fetchData = async () => {
 }
 
 const HomeView = ({ data }: { data: JsonPlaceholder[] }) => {
-  const _buildImageWithText = (imagePath: ImageSourcePropType, text: string, textP: string) => (
-    <View style={styles.imageContainer}>
-      <Image
-        source={{ uri: imagePath }}
-        style={styles.image}
-      />
-      <View style={styles.textContainer}>
-        <Text style={styles.productName}>{text}</Text>
-        <Text style={styles.price}>{textP}</Text>
+  const navigation = useNavigation();
+
+  const _buildImageWithText = (imagePath: ImageSourcePropType, text: string, textP: string, onPress: () => void) => (
+    <TouchableOpacity onPress={onPress}>
+      <View style={styles.imageContainer}>
+        <Image
+          source={{ uri: imagePath }}
+          style={styles.image}
+        />
+        <View style={styles.textContainer}>
+          <Text style={styles.productName}>{text}</Text>
+          <Text style={styles.price}>{textP}</Text>
+        </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 
   return (
@@ -41,7 +46,9 @@ const HomeView = ({ data }: { data: JsonPlaceholder[] }) => {
           <View style={{ flexDirection: 'row' }}>
             {data.map(item => (
               <View style={{ paddingRight: 16 }} key={item.id}>
-                {_buildImageWithText(item.image, item.name, `$${item.price}`)}
+                {_buildImageWithText(item.image, item.name, `$${item.price}`, () => {
+                  navigation.navigate('ProdInfo', { item });
+                })}
               </View>
             ))}
           </View>
@@ -57,6 +64,8 @@ const MainScreen = () => {
   useEffect(() => {
     fetchData().then(setData);
   }, []);
+
+  const Tab = createBottomTabNavigator();
 
   return (
     <Tab.Navigator screenOptions={{ headerShown: false }}>
@@ -141,7 +150,5 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
 });
-
-const Tab = createBottomTabNavigator();
 
 export default MainScreen;

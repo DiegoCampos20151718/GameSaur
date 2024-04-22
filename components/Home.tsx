@@ -26,7 +26,7 @@ const HomeView = ({ data }: { data: JsonPlaceholder[] }) => {
   const _buildImageWithText = (imagePath: ImageSourcePropType, text: string, textP: string, onPress: () => void) => (
     <TouchableOpacity onPress={onPress}>
       <View style={styles.imageContainer}>
-        <Image source={{ uri: imagePath }} style={styles.image} />
+        <Image source={`http://localhost/geingeemu/public/${imagePath}`} style={styles.image} />
         <View style={styles.textContainer}>
           <Text style={styles.productName}>{text}</Text>
           <Text style={styles.price}>{textP}</Text>

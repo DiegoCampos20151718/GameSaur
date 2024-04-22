@@ -5,7 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 class ProdInfo extends React.Component {
   render() {
     const { item } = this.props.route.params;
-    
+
     return (
       <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.header}>
@@ -14,7 +14,7 @@ class ProdInfo extends React.Component {
         </View>
 
         <View style={styles.imageContainer}>
-          <Image source={{ uri: item.image }} style={styles.image} />
+          <Image source={`http://localhost/geingeemu/public/${item.image}`} style={styles.image} />
         </View>
 
         <View style={styles.descriptionContainer}>
@@ -67,9 +67,10 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   image: {
-    width: '100%',
+    width: '50%',
     height: 250,
     resizeMode: 'cover',
+    alignSelf: 'center'
   },
   descriptionContainer: {
     backgroundColor: '#ffffff',

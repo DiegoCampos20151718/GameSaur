@@ -29,11 +29,13 @@ const LoginScreen = ({ navigation }) => {
           password: password,
         }),
       });
-      // const json = await response.json();
-      // console.log(json.token);
-      // if (json.success) {
-      //   await AsyncStorage.setItem('userToken', json.token);  // Asumiendo que la API devuelve un 'token'
-        
+      if (!response.ok) {
+        console.error('HTTP error', response.status, await response.text());
+        Alert.alert('Login Error', `Server responded with status: ${response.status}`);
+        return;
+      }
+      const json = await response.json();
+      console.log(json); // Check what the API returned
         navigation.navigate('Home');
       // } else {
       //   Alert.alert('Login Failed', json.message || 'Invalid credentials');

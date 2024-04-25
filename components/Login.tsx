@@ -1,53 +1,20 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, Text, TextInput, TouchableOpacity, Image, Alert, ActivityIndicator } from 'react-native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { createDrawerNavigator } from '@react-navigation/drawer';
-import { NavigationContainer } from '@react-navigation/native';
-import Registration from './Register';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useAuth } from './AuthService'; 
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const { login } = useAuth();
 
   const validateEmail = (email) => {
     const re = /\S+@\S+\.\S+/;
     return re.test(email);
   };
 
-  const authenticateUser = async (email, password) => {
-    setLoading(true);
-    try {
-      const response = await fetch('http://localhost/geingeemu/public/api/login', {
-        method: 'POST',
-        headers: {
-          'Content-type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: email,
-          password: password,
-        }),
-      });
-      if (!response.ok) {
-        console.error('HTTP error', response.status, await response.text());
-        Alert.alert('Login Error', `Server responded with status: ${response.status}`);
-        return;
-      }
-      const json = await response.json();
-      console.log(json); // Check what the API returned
-        navigation.navigate('Home');
-      // } else {
-      //   Alert.alert('Login Failed', json.message || 'Invalid credentials');
-      // }
-    } catch (error) {
-      console.error('Login Error:', error);
-      Alert.alert('Login Error', 'Unable to connect to the server');
-    }
-    setLoading(false);
-  };
-
-  const handleLogin = () => {
+  const authenticateUser = async () => {
     if (!email || !password) {
       Alert.alert('Error', 'Please fill in all fields');
       return;
@@ -56,7 +23,34 @@ const LoginScreen = ({ navigation }) => {
       Alert.alert('Error', 'Please enter a valid email');
       return;
     }
-    authenticateUser(email, password);
+
+    setLoading(true);
+    try {
+      const response = await fetch('http://localhost/geingeemu/public/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: email,
+          password: password,
+        }),
+      });
+
+      const json = await response.json();
+      if (!response.ok) {
+        Alert.alert('Login Error', `Server responded with status: ${response.status}`);
+        return;
+      }
+      await AsyncStorage.setItem('authToken', json.token); // Assuming 'token' is the correct field
+      login(json.data.token);
+      console.log(json.data.token);
+      navigation.navigate('User');
+    } catch (error) {
+      Alert.alert('Login Error', 'Unable to connect to the server');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -82,12 +76,12 @@ const LoginScreen = ({ navigation }) => {
       {loading ? (
         <ActivityIndicator size="large" color="#007AFF" />
       ) : (
-        <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
+        <TouchableOpacity style={styles.loginButton} onPress={authenticateUser}>
           <Text style={styles.loginButtonText}>Login</Text>
         </TouchableOpacity>
       )}
-      <TouchableOpacity>
-        <Text style={styles.signUpText} onPress={() => navigation.navigate('Register')}>
+      <TouchableOpacity onPress={() => navigation.navigate('Register')}>
+        <Text style={styles.signUpText}>
           Don't have an account? Click here
         </Text>
       </TouchableOpacity>
@@ -101,11 +95,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5F5F5',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 20, // Added padding for overall screen
+    paddingHorizontal: 20,
   },
   logo: {
-    width: 100, // Adjusted to larger size based on the image
-    height: 100, // Adjusted to larger size based on the image
+    width: 100,
+    height: 100,
     marginBottom: 30,
   },
   appName: {
@@ -115,47 +109,39 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   loginText: {
-    fontSize: 28, // Made larger based on the image
+    fontSize: 28,
     fontWeight: 'bold',
-    color: '#007AFF', // Assuming the color matches the logo
+    color: '#007AFF',
     marginBottom: 30,
   },
   input: {
-    width: '100%', // Made full-width based on the image
-    height: 50, // Increased height for better touch area
+    width: '100%',
+    height: 50,
     borderColor: '#007AFF',
-    borderWidth: 2, // Made border thicker
-    borderRadius: 10, // Increased border radius
-    paddingHorizontal: 15, // Increased padding for text inside input
-    marginBottom: 20, // Increased space between inputs
-    fontSize: 18, // Larger font for better readability
+    borderWidth: 2,
+    borderRadius: 10,
+    paddingHorizontal: 15,
+    marginBottom: 20,
+    fontSize: 18,
   },
   loginButton: {
-    width: '100%', // Full-width button
-    height: 50, // Increased height for a bigger touch area
+    width: '100%',
+    height: 50,
     backgroundColor: '#007AFF',
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 10, // Matched border radius with inputs
+    borderRadius: 10,
     marginBottom: 20,
   },
   loginButtonText: {
     color: '#FFFFFF',
-    fontSize: 20, // Increased font size
+    fontSize: 20,
     fontWeight: 'bold',
-  },
-  keepSessionContainer: {
-    flexDirection: 'row',
-    marginBottom: 20, // Increased space before sign up option
-  },
-  keepSessionText: {
-    color: '#007AFF',
-    fontSize: 16, // Adjusted font size for readability
   },
   signUpText: {
     color: '#007AFF',
-    fontSize: 16, // Adjusted font size for readability
-    textDecorationLine: 'underline', // Added underline as is common for links
+    fontSize: 16,
+    textDecorationLine: 'underline',
   },
 });
 

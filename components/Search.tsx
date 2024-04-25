@@ -1,66 +1,88 @@
-import React from 'react';
-import { View, Text, TextInput, Image, FlatList, StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, ScrollView, Image, ImageSourcePropType, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import WishList from '../components/WishList';
+import ShoppingCartView from '../components/Cart';
 
-interface Product {
-    id: number;
-    title: string;
-    price: number;
-    image: any;
-  }
-const data = [
-  {
-    id: 1,
-    title: 'Halo Infinite Xbox Series X Limited Edition Steelbook Edition',
-    price: 3750.0,
-    image: require('../assets/images/haloinfinite.jpg'),
-  },
-  {
-    id: 2,
-    title: 'Pokemon',
-    price: 3199.0,
-    image: require('../assets/images/pokemon.jpg'),
-  },
-  {
-    id: 3,
-    title: 'Kirby',
-    price: 10199.0,
-    image: require('../assets/images/kirby.jpg'),
-  },
-  {
-    id: 4,
-    title: 'Spiderman',
-    price: 3750.0,
-    image: require('../assets/images/spiderman.jpg'),
-  },
-];
+type JsonPlaceholder = {
+  id: string;
+  name: string;
+  image: string;
+  description: string;
+  price: number;
+}
 
-const App = () => {
-    const renderItem = ({ item }: { item: Product }) => (
-      <View style={styles.itemContainer}>
-        <Image source={{ uri: item.image }} style={styles.itemImage} />
-        <Text style={styles.itemTitle}>{item.title}</Text>
-        <Text style={styles.itemPrice}>{item.price.toFixed(2)} MXN</Text>
+const fetchData = async () => {
+  const response = await fetch('http://localhost/geingeemu/public/api/videogame_index');
+  return await response.json();
+}
+
+const SearchView = ({ data }: { data: JsonPlaceholder[] }) => {
+  const [searchQuery, setSearchQuery] = useState('');
+  const navigation = useNavigation();
+
+  const _buildImageWithText = (imagePath: ImageSourcePropType, text: string, textP: string, onPress: () => void) => (
+    <TouchableOpacity onPress={onPress}>
+      <View style={styles.imageContainer}>
+        <Image source={`http://localhost/geingeemu/public/${imagePath}`} style={styles.image} />
+        <View style={styles.textContainer}>
+          <Text style={styles.productName} numberOfLines={2} ellipsizeMode="tail">{text}</Text>
+          <Text style={styles.price}>{textP.length > 8 ? textP.substring(0, 8) : textP}</Text>
+        </View>
       </View>
-    );
-  
-    return (
-      <View style={styles.container}>
-        <TextInput style={styles.searchInput} placeholder="Search" />
-        <FlatList
-          data={data}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.id.toString()}
-          numColumns={2}
+    </TouchableOpacity>
+  );
+
+  const filteredData = data.filter(item =>
+    item.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  return (
+    <View style={styles.container}>
+      <ScrollView>
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search"
+          onChangeText={setSearchQuery}
+          value={searchQuery}
         />
-      </View>
-    );
-  };
+
+        <Text style={styles.sectionHeader}>All Products</Text>
+        <View style={styles.productsContainer}>
+            {filteredData.map(item => (
+              <View style={styles.productItem} key={item.id}>
+                {_buildImageWithText(item.image, item.name, `$${item.price}`, () => {
+                  navigation.navigate('ProdInfo', { item });
+                })}
+              </View>
+            ))}
+          </View>
+      </ScrollView>
+    </View>
+  );
+}
+
+const MainScreen = () => {
+  const [data, setData] = useState<JsonPlaceholder[]>([]);
+
+  useEffect(() => {
+    fetchData().then(setData);
+  }, []);
+
+  return (
+    <View>
+      <SearchView data={data}/>
+    </View>
+  );
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
+    margin: 16,
+    backgroundColor: '#fff'
   },
   searchInput: {
     borderWidth: 1,
@@ -68,28 +90,45 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     padding: 8,
     marginBottom: 16,
+
   },
-  itemContainer: {
-    flex: 1,
-    padding: 8,
-    alignItems: 'center',
-    width: '50%',
-  },
-  itemImage: {
+  imageContainer: {
+    marginRight: 16,
     width: '100%',
-    height: 150,
-    resizeMode: 'contain',
   },
-  itemTitle: {
+  image: {
+    width: '100%',
+    height: 250,
+  },
+  textContainer: {
+    marginTop: 8,
+    alignItems: 'baseline',
+  },
+  productsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  productItem: {
+    width: '48%',
+    marginBottom: 8,
+  },
+  productName: {
     fontSize: 16,
     fontWeight: 'bold',
-    marginTop: 8,
+    overflow: 'hidden',
   },
-  itemPrice: {
-    fontSize: 14,
+  price: {
+    fontSize: 16,
+    fontWeight: 'bold',
     color: 'green',
-    marginTop: 4,
+    marginLeft: 8,
+  },
+  sectionHeader: {
+    fontWeight: 'bold',
+    fontSize: 30,
+    marginBottom: 8,
   },
 });
 
-export default App;
+export default MainScreen;

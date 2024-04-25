@@ -28,8 +28,8 @@ const HomeView = ({ data }: { data: JsonPlaceholder[] }) => {
       <View style={styles.imageContainer}>
         <Image source={`http://localhost/geingeemu/public/${imagePath}`} style={styles.image} />
         <View style={styles.textContainer}>
-          <Text style={styles.productName}>{text}</Text>
-          <Text style={styles.price}>{textP}</Text>
+          <Text style={styles.productName} numberOfLines={2} ellipsizeMode="tail">{text}</Text>
+          <Text style={styles.price}>{textP.length > 8 ? textP.substring(0, 8) : textP}</Text>
         </View>
       </View>
     </TouchableOpacity>
@@ -48,12 +48,30 @@ const HomeView = ({ data }: { data: JsonPlaceholder[] }) => {
           onChangeText={setSearchQuery}
           value={searchQuery}
         />
+
+        <Image source={require('../assets/images/banner.png')} style={{width: '100%', height: 125}} />
+
+        <Image source={require('../assets/images/brands.png')} style={{width: '100%', height: 100, marginTop: 20}} />
+
         <Text style={styles.sectionHeader}>Featured</Text>
         <ScrollView horizontal={true}>
           <View style={{ flexDirection: 'row' }}>
             {filteredData.map(item => (
               <View style={{ paddingRight: 16 }} key={item.id}>
                 {_buildImageWithText(item.image, item.name, `$${item.price}`, () => {
+                  navigation.navigate('ProdInfo', { item });
+                })}
+              </View>
+            ))}
+          </View>
+        </ScrollView>
+
+        <Text style={styles.sectionHeader}>Offers</Text>
+        <ScrollView horizontal={true}>
+          <View style={{ flexDirection: 'row' }}>
+            {filteredData.map(item => (
+              <View style={{ paddingRight: 16 }} key={item.id}>
+                {_buildImageWithText(item.image, item.name, `$${item.price*0.9}`, () => {
                   navigation.navigate('ProdInfo', { item });
                 })}
               </View>
@@ -120,6 +138,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     margin: 16,
+    backgroundColor: '#fff'
   },
   searchInput: {
     borderWidth: 1,
@@ -143,17 +162,17 @@ const styles = StyleSheet.create({
   productName: {
     fontSize: 16,
     fontWeight: 'bold',
+    overflow: 'hidden',
   },
   price: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#000',
+    color: 'green',
     marginLeft: 8,
   },
   sectionHeader: {
     fontWeight: 'bold',
     fontSize: 30,
-    marginLeft: 12,
     marginBottom: 8,
   },
 });

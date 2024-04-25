@@ -23,6 +23,10 @@ const HomeView = ({ data }: { data: JsonPlaceholder[] }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const navigation = useNavigation();
 
+  const handleSearchPress = () => {
+    navigation.navigate('Search');  // Ensure you have a 'Search' screen in your navigation stack
+  };
+
   const _buildImageWithText = (imagePath: ImageSourcePropType, text: string, textP: string, onPress: () => void) => (
     <TouchableOpacity onPress={onPress}>
       <View style={styles.imageContainer}>
@@ -42,12 +46,15 @@ const HomeView = ({ data }: { data: JsonPlaceholder[] }) => {
   return (
     <View style={styles.container}>
       <ScrollView>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Search"
-          onChangeText={setSearchQuery}
-          value={searchQuery}
-        />
+      <TouchableOpacity onPress={handleSearchPress} style={styles.searchBarContainer}>
+      <TextInput
+            style={styles.searchInput}
+            placeholder="Search"
+            onChangeText={setSearchQuery}
+            value={searchQuery}
+            editable={false}  // Makes the text input non-editable but still usable as part of touchable opacity
+          />
+        </TouchableOpacity>
 
         <Image source={require('../assets/images/banner.png')} style={{width: '100%', height: 125}} />
 
@@ -140,12 +147,19 @@ const styles = StyleSheet.create({
     margin: 16,
     backgroundColor: '#fff'
   },
+  searchBarContainer: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 4,
+    marginBottom: 16
+  },
   searchInput: {
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 4,
     padding: 8,
     marginBottom: 16,
+    height: 48  // Optional: Adjust the height to suit your design
   },
   imageContainer: {
     marginRight: 16,

@@ -15,7 +15,7 @@ interface AuthProviderProps {
   children: ReactNode;
 }
 
-const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [token, setToken] = useState<string>('');
 
@@ -25,7 +25,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       try {
         userToken = await AsyncStorage.getItem('authToken');
       } catch (e) {
-        // Restaurar token falló
+        // Restore token failed
       }
       setIsLoggedIn(!!userToken);
       setToken(userToken ?? '');

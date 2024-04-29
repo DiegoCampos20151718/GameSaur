@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, Text, TextInput, TouchableOpacity, Image, Alert, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useAuth } from './AuthService'; 
+import { useAuth } from './AuthService';
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
@@ -43,9 +43,11 @@ const LoginScreen = ({ navigation }) => {
         return;
       }
       await AsyncStorage.setItem('authToken', json.token); // Assuming 'token' is the correct field
-      login(json.data.token);
-      console.log(json.data.token);
-      navigation.navigate('User');
+      login(json.data.token); // Authenticates the session with the token
+      const id = json.data.id; // Assuming 'id' is received as part of the data
+      await AsyncStorage.setItem('userId', id.toString()); // Store user id in AsyncStorage
+      console.log(json);
+      navigation.navigate('Profile', { id });
     } catch (error) {
       Alert.alert('Login Error', 'Unable to connect to the server');
     } finally {

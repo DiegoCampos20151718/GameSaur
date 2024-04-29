@@ -1,29 +1,40 @@
-// AuthService.jsx
-import React, { createContext, useContext, useState, useEffect } from 'react';
+// AuthService.tsx
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const AuthContext = createContext();
+interface AuthContextType {
+  isLoggedIn: boolean;
+  login: (TokenData: string) => Promise<void>;
+  logout: () => Promise<void>;
+  token: string;
+}
 
-export const AuthProvider = ({ children }) => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [token, setToken] = useState('');
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+interface AuthProviderProps {
+  children: ReactNode;
+}
+
+const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const [token, setToken] = useState<string>('');
 
   useEffect(() => {
     const bootstrapAsync = async () => {
-      let userToken;
+      let userToken: string | null = null;
       try {
         userToken = await AsyncStorage.getItem('authToken');
       } catch (e) {
         // Restaurar token falló
       }
       setIsLoggedIn(!!userToken);
-      setToken(userToken);
+      setToken(userToken ?? '');
     };
 
     bootstrapAsync();
   }, []);
 
-  const login = async (TokenData) => {
+  const login = async (TokenData: string) => {
     await AsyncStorage.setItem('authToken', TokenData);
     setToken(TokenData);
     setIsLoggedIn(true);
@@ -42,25 +53,32 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-export const useAuth = () => {
-  return useContext(AuthContext);
+export const useAuth = (): AuthContextType => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
 };
 
-export const useToken = () => {
-  return useContext(AuthContext).token;
+export const useToken = (): string => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useToken must be used within an AuthProvider');
+  }
+  return context.token;
 };
 
-// AuthService.js (Separate file if necessary or you can include these methods in AuthService.jsx)
 export class AuthService {
-  static async setToken(token) {
+  static async setToken(token: string): Promise<void> {
     await AsyncStorage.setItem('authToken', token);
   }
 
-  static async getToken() {
+  static async getToken(): Promise<string | null> {
     return await AsyncStorage.getItem('authToken');
   }
 
-  static async removeToken() {
+  static async removeToken(): Promise<void> {
     await AsyncStorage.removeItem('authToken');
   }
 }

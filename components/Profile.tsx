@@ -14,18 +14,10 @@ interface UserData {
   role: string;
 }
 
-const Profile: React.FC = () => {
+const Profile: React.FC = ({ navigation }) => {
   const token = useToken();  // Token fetched using custom hook
-  const [userId, setUserId] = useState<string | null>(null);  // State to hold the user ID
-  const [userData, setUserData] = useState<UserData>({
-    firstname: '',
-    lastname: '',
-    birthdate: '',
-    address: '',
-    phone_number: '',
-    email: '',
-    role: '',
-  });
+  const [userId, setUserId] = useState<string | null>(null);
+  const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -36,17 +28,18 @@ const Profile: React.FC = () => {
     };
 
     fetchUserId();  // Call the async function to fetch the user ID
+  }, []);
+
+  useEffect(() => {
+    if (!userId || !token) return; // Only proceed if both userId and token are available
 
     const getUserDetails = async () => {
       try {
-        console.log('Data: ');
         const response = await axios.get(`http://localhost/geingeemu/public/api/userview/${userId}`, {
           headers: {
-            'Token': `${token}`,
-            'Authorization': `Bearer ${useToken()}`,
+            'Authorization': `Bearer ${token}`,
           },
         });
-        console.log('Data: ', response.data);
         setUserData(response.data);
         setLoading(false);
       } catch (error) {
@@ -57,12 +50,11 @@ const Profile: React.FC = () => {
     };
 
     getUserDetails();
-  
-  }, [userId, token]);  // Empty dependency array means this effect runs once after the component mounts
+  }, [userId, token]);  // React when userId or token changes
 
   const handleEditProfile = () => {
     // Navigate to the EditProfile screen with userId
-    navigation.navigate('EditProfile', { userId });
+    if (userId) navigation.navigate('EditProfile', { userId });
   };
 
   return (
@@ -71,16 +63,16 @@ const Profile: React.FC = () => {
         <View style={styles.placeholder}>
           <Text>Loading...</Text>
         </View>
-      ) : (
+      ) : error ? (
+        <Text style={{ color: 'red', marginBottom: 20 }}>{error}</Text>
+      ) : userData ? (
         <View style={styles.container}>
-          {error ? (
-            <Text style={{ color: 'red', marginBottom: 20 }}>{error}</Text>
-          ) : null}
           <Text style={{ fontSize: 24 }}>User Profile</Text>
-          <Text>Token: {useToken()}</Text>
           <Text>Email: {userData.email}</Text>
           <Button title="Edit Profile" onPress={handleEditProfile} color="#007bff" />
         </View>
+      ) : (
+        <Text>No user data available.</Text>
       )}
     </View>
   );
@@ -91,7 +83,7 @@ const styles = StyleSheet.create({
     maxWidth: 800,
     width: '100%',
     padding: 20,
-    backgroundColor: '#000',
+    backgroundColor: '#FFF',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.1,

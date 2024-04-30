@@ -7,6 +7,7 @@ import Home from './components/Home';
 import Search from './components/Search';
 import ProdInfo from './components/ProdInfo';
 import Profile from './components/Profile';
+import BilingView from './components/BilingView';
 import { AuthProvider } from './components/AuthService';
 const Drawer = createDrawerNavigator();
 
@@ -21,6 +22,7 @@ const App = () => {
         <Drawer.Screen name="Register" component={Register} />
         <Drawer.Screen name="Search" component={Search} />
         <Drawer.Screen name="ProdInfo" component={ProdInfo} />
+        <Drawer.Screen name="Biling" component={BilingView} />
       </Drawer.Navigator>
       </AuthProvider>
     </NavigationContainer>

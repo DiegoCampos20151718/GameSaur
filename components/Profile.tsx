@@ -24,7 +24,7 @@ const Profile: React.FC = ({ navigation }) => {
   useEffect(() => {
     const fetchUserId = async () => {
       const storedUserId = await AsyncStorage.getItem('userId');  // Retrieve the user ID from AsyncStorage
-      setUserId(storedUserId);  // Update state with the retrieved ID
+      setUserId(storedUserId);
     };
 
     fetchUserId();  // Call the async function to fetch the user ID
@@ -52,10 +52,13 @@ const Profile: React.FC = ({ navigation }) => {
     getUserDetails();
   }, [userId, token]);  // React when userId or token changes
 
-  const handleEditProfile = () => {
-    // Navigate to the EditProfile screen with userId
-    if (userId) navigation.navigate('EditProfile', { userId });
+
+
+  const ViewBilings = () => {
+    navigation.navigate('Biling', { userId });
   };
+
+
 
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -68,8 +71,13 @@ const Profile: React.FC = ({ navigation }) => {
       ) : userData ? (
         <View style={styles.container}>
           <Text style={{ fontSize: 24 }}>User Profile</Text>
-          <Text>Email: {userData.email}</Text>
-          <Button title="Edit Profile" onPress={handleEditProfile} color="#007bff" />
+          <Text>Name: {userData.firstname} {userData.lastname}</Text>
+          <Text>address: {userData.address}</Text>
+          <Text>birthdate: {userData.birthdate}</Text>
+          <Text>email: {userData.email}</Text>
+          <Text>role: {userData.role}</Text>
+
+          <Button title="View Bilings" onPress={ViewBilings} color="#007bff" />
         </View>
       ) : (
         <Text>No user data available.</Text>

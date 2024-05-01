@@ -58,6 +58,10 @@ const Profile: React.FC = ({ navigation }) => {
     navigation.navigate('Biling', { userId });
   };
 
+  const ViewGamesStore = () => {
+    navigation.navigate('Loaded Games', { userId });
+  };
+
 
 
   return (
@@ -77,7 +81,8 @@ const Profile: React.FC = ({ navigation }) => {
           <Text>email: {userData.email}</Text>
           <Text>role: {userData.role}</Text>
 
-          <Button title="View Bilings" onPress={ViewBilings} color="#007bff" />
+          <Button title="View Bilings" onPress={ViewBilings} color="#007bff" /> 
+          <Button title="View Games" onPress={ViewGamesStore} color="#007bff" />
         </View>
       ) : (
         <Text>No user data available.</Text>

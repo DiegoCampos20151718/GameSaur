@@ -59,7 +59,7 @@ const Profile: React.FC = ({ navigation }) => {
   };
 
   const ViewGamesStore = () => {
-    navigation.navigate('Loaded Games', { userId });
+    navigation.navigate('Games', { userId });
   };
 
 

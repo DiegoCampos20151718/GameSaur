@@ -19,7 +19,7 @@ interface VideoGame {
 
 const GamesUser: React.FC = ({ navigation }) => {
   const token = useToken();
-  const [userId, setUserId] = useState<string | null>(null);
+  const [userId, setUserId] = useState<BigInteger | null>(null);
   const [videoGame, setVideoGame] = useState<VideoGame | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -27,7 +27,9 @@ const GamesUser: React.FC = ({ navigation }) => {
   useEffect(() => {
     const fetchUserId = async () => {
       const storedUserId = await AsyncStorage.getItem('userId');
-      setUserId(storedUserId);
+      if (storedUserId) {
+        setUserId(BigInt(storedUserId));
+      }
     };
     fetchUserId();
   }, []);
@@ -35,9 +37,10 @@ const GamesUser: React.FC = ({ navigation }) => {
   useEffect(() => {
     const fetchData = async () => {
       if (!userId || !token) return;
+      console.log(userId);
 
       try {
-        const response = await axios.get<VideoGame>(`http://localhost/geingeemu/public/api/loadgames/${userId}`, {
+        const response = await axios.get<VideoGame>(`http://localhost/geingeemu/public/api/loadgame/${userId}`, {
           headers: { 'Authorization': `Bearer ${token}` },
         });
         setVideoGame({
@@ -50,7 +53,6 @@ const GamesUser: React.FC = ({ navigation }) => {
         console.error('Fetch error:', error);
         if (axios.isAxiosError(error)) {
           if (error.response) {
-            // You can use error.response.data to get more specific error information if your server provides it
             setError(`Error: ${error.response.status} - ${error.response.statusText}`);
           } else if (error.request) {
             setError("No response received from server. Please check your network connection.");

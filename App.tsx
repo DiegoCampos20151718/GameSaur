@@ -9,6 +9,7 @@ import ProdInfo from './components/ProdInfo';
 import Profile from './components/Profile';
 import BilingView from './components/BilingView';
 import GamesUser from './components/GamesUser';
+import Addgame from './components/Addgame';
 import { AuthProvider } from './components/AuthService';
 const Drawer = createDrawerNavigator();
 
@@ -24,8 +25,8 @@ const App = () => {
         <Drawer.Screen name="Search" component={Search} />
         <Drawer.Screen name="ProdInfo" component={ProdInfo} />
         <Drawer.Screen name="Biling" component={BilingView} />
-        <Drawer.Screen name="Loaded Games" component={GamesUser} />
-
+        <Drawer.Screen name="Loaded_Games" component={GamesUser} />
+        <Drawer.Screen name="AddGame" component={Addgame} />
       </Drawer.Navigator>
       </AuthProvider>
     </NavigationContainer>

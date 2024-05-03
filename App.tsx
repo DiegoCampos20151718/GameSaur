@@ -26,7 +26,7 @@ const App = () => {
         <Drawer.Screen name="ProdInfo" component={ProdInfo} />
         <Drawer.Screen name="Biling" component={BilingView} />
         <Drawer.Screen name="Games" component={GamesUser} />
-
+        <Drawer.Screen name="Addgame" component={Addgame} />
       </Drawer.Navigator>
       </AuthProvider>
     </NavigationContainer>

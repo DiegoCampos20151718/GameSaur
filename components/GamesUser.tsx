@@ -2,20 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useToken } from './AuthService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
-import { ScrollView, View, Text, StyleSheet, Image, ActivityIndicator } from 'react-native';
-
-interface VideoGame {
-  id: number;
-  name: string;
-  description: string;
-  stock: number;
-  price: number;
-  digital: boolean;
-  physical: boolean;
-  image: string;
-  created_at: string;
-  updated_at: string;
-}
+import { ScrollView, View, Text, StyleSheet, Image, ActivityIndicator, Button, Alert } from 'react-native';
 
 const GamesUser: React.FC = ({ navigation }) => {
   const token = useToken();
@@ -37,7 +24,6 @@ const GamesUser: React.FC = ({ navigation }) => {
   useEffect(() => {
     const fetchData = async () => {
       if (!userId || !token) return;
-      console.log(userId);
 
       try {
         const response = await axios.get<VideoGame>(`http://localhost/geingeemu/public/api/loadgame/${userId}`, {
@@ -46,10 +32,10 @@ const GamesUser: React.FC = ({ navigation }) => {
         setVideoGame({
           ...response.data,
           digital: response.data?.digital === 0,
-          physical: response.data?.physical === 1,          
+          physical: response.data?.physical === 1,
         });
         setLoading(false);
-    } catch (error: any) {
+      } catch (error: any) {
         console.error('Fetch error:', error);
         if (axios.isAxiosError(error)) {
           if (error.response) {
@@ -64,12 +50,25 @@ const GamesUser: React.FC = ({ navigation }) => {
         }
         setLoading(false);
       }
-      
-      
     };
 
     fetchData();
   }, [userId, token]);
+
+  const deleteGame = async () => {
+    try {
+      if (!videoGame) return;
+      await axios.delete(`http://localhost/geingeemu/public/api/destroy/${videoGame.id}`, {
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+      Alert.alert('Game Deleted', 'The game has been successfully deleted.');
+      // Optionally, you can update the state or navigate to another screen after deleting the game.
+    } catch (error) {
+      console.error('Delete error:', error);
+      Alert.alert('Error', 'Failed to delete the game. Please try again.');
+    }
+  };
+  
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -79,12 +78,13 @@ const GamesUser: React.FC = ({ navigation }) => {
         <Text style={styles.error}>{error}</Text>
       ) : videoGame ? (
         <View style={styles.card}>
-          <Text style={styles.title}>{videoGame.name}</Text>
+          <Text style={styles.title}>{videoGame.name}</Text><Text style={styles.text}>id game: {videoGame.id}</Text>
           <Image style={styles.image} source={{ uri: videoGame.image }} />
           <Text style={styles.text}>Description: {videoGame.description}</Text>
           <Text style={styles.text}>Price: {videoGame.price}</Text>
           <Text style={styles.text}>Stock: {videoGame.stock}</Text>
           <Text style={styles.text}>{videoGame.physical ? 'Physical Copy Available' : 'Digital Only'}</Text>
+          <Button title="Delete Game" onPress={deleteGame} />
         </View>
       ) : (
         <Text>No game data available.</Text>

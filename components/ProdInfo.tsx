@@ -14,7 +14,7 @@ class ProdInfo extends React.Component {
         </View>
 
         <View style={styles.imageContainer}>
-          <Image source={`http://localhost/geingeemu/public/${item.image}`} style={styles.image} />
+          <Image source={item.image} style={styles.image} />
         </View>
 
         <View style={styles.descriptionContainer}>

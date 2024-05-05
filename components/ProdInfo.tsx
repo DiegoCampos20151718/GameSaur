@@ -1,35 +1,92 @@
-import React from 'react';
-import { StyleSheet, View, Text, Image, TouchableOpacity, ScrollView } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, View, Text, Image, TouchableOpacity, ScrollView, ImageSourcePropType } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RouteProp } from '@react-navigation/native';
+import { RootStackParamList } from './App';
+import { useNavigation } from '@react-navigation/native';
 
-class ProdInfo extends React.Component {
-  render() {
-    const { item } = this.props.route.params;
 
-    return (
-      <ScrollView contentContainerStyle={styles.container}>
-        <View style={styles.header}>
-          <Text style={styles.headerText}>{item.name}</Text>
-          <Text style={styles.price}>${item.price}</Text>
-        </View>
+type ProdInfoScreenNavigationProp = StackNavigationProp<RootStackParamList, 'ProdInfo'>;
+type ProdInfoScreenRouteProp = RouteProp<RootStackParamList, 'ProdInfo'>;
 
-        <View style={styles.imageContainer}>
-          <Image source={item.image} style={styles.image} />
-        </View>
+type Props = {
+  navigation: ProdInfoScreenNavigationProp;
+  route: ProdInfoScreenRouteProp;
+};
 
-        <View style={styles.descriptionContainer}>
-          <Text style={styles.description}>{item.description}</Text>
-        </View>
+type Product = {
+  name: string;
+  price: number;
+  description: string;
+  image: ImageSourcePropType;
+};
 
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.button}>
-            <Text style={styles.buttonText}>Buy Now</Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
-    );
-  }
-}
+const ProdInfo: React.FC<Props> = ({ navigation, route }) => {
+  const { item } = route.params;
+  const [key, setKey] = useState(Date.now().toString());
+  const [isInWishlist, setIsInWishlist] = useState(false);
+
+  
+
+  const toggleWishlist = async (item: Product) => {
+    try {
+      const existingItems = await AsyncStorage.getItem('wishItems');
+      let items: Product[] = [];
+      if (existingItems !== null) {
+        items = JSON.parse(existingItems);
+      }
+      items.push(item);
+      await AsyncStorage.setItem('wishItems', JSON.stringify(items));
+      setKey(Date.now().toString());
+      navigation.navigate('Wishlist');
+    } catch (error) {
+      console.error('Error adding to wishlist: ', error);
+    }
+  };
+
+  const addToCart = async (item: Product) => {
+    try {
+      const existingItems = await AsyncStorage.getItem('cartItems');
+      let items: Product[] = [];
+      if (existingItems !== null) {
+        items = JSON.parse(existingItems);
+      }
+      items.push(item);
+      await AsyncStorage.setItem('cartItems', JSON.stringify(items));
+      setKey(Date.now().toString());
+      navigation.navigate('Cart');
+    } catch (error) {
+      console.error('Error adding to cart: ', error);
+    }
+  };
+
+  return (
+    <ScrollView key={key} contentContainerStyle={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.headerText}>{item.name}</Text>
+        <Text style={styles.price}>${item.price}</Text>
+      </View>
+
+      <View style={styles.imageContainer}>
+        <Image source={item.image} style={styles.image} />
+      </View>
+
+      <View style={styles.descriptionContainer}>
+        <Text style={styles.description}>{item.description}</Text>
+      </View>
+
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity style={[styles.button]} onPress={() => toggleWishlist(item)}>
+          <Text style={styles.buttonText}>Add to Wishlist</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={() => addToCart(item)}>
+          <Text style={styles.buttonText}>Add to Cart</Text>
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -106,6 +163,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
+    marginBottom: 10,
   },
   buttonText: {
     color: '#ffffff',

@@ -10,8 +10,13 @@ import Profile from './components/Profile';
 import BilingView from './components/BilingView';
 import GamesUser from './components/GamesUser';
 import Addgame from './components/Addgame';
+import Wishlist from './components/WishList';
 import { AuthProvider } from './components/AuthService';
 const Drawer = createDrawerNavigator();
+export type RootStackParamList = {
+  ProdInfo: { item: Product };
+  Wishlist: undefined;
+};
 
 const App = () => {
   return (
@@ -27,6 +32,7 @@ const App = () => {
         <Drawer.Screen name="Biling" component={BilingView} />
         <Drawer.Screen name="Games" component={GamesUser} />
         <Drawer.Screen name="Addgame" component={Addgame} />
+        <Drawer.Screen name="Wishlist" component={Wishlist} />
       </Drawer.Navigator>
       </AuthProvider>
     </NavigationContainer>

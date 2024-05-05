@@ -1,50 +1,73 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Define Videojuego interface
-interface Videojuego {
-  nombre: string;
-  precio: number;
-  imagenPath: any; // Use any for simplicity, replace it with the actual type of your image paths
+interface wishItems {
+  name: string;
+  image: any; // Utiliza el tipo adecuado para las imágenes
+  price: number;
 }
 
-// Define WishlistView component
-const WishlistView: React.FC = () => {
-  // Lista de videojuegos deseados
-  const [videojuegosDeseados, setVideojuegosDeseados] = useState<Videojuego[]>([
-    { nombre: 'The Legend of Zelda: Breath of the Wild', precio: 1999.99, imagenPath: require('../assets/images/zelda.jpg') },
-    { nombre: 'Halo Infinite Xbox Collector Steelbook Edition', precio: 2500.00, imagenPath: require('../assets/images/haloinfinite.jpg') },
-    { nombre: 'Halo 5', precio: 2500.00, imagenPath: require('../assets/images/halo5.jpg') },
-    // Puedes agregar más videojuegos según sea necesario
-  ]);
+const wishlistview: React.FC = () => {
+  const [wishItems, setwishItems] = useState<wishItems[]>([]);
 
-  // Función para remover un videojuego de la lista de deseos
-  const removerDeWishlist = (videojuego: Videojuego) => {
-    const updatedList = videojuegosDeseados.filter(item => item !== videojuego);
-    setVideojuegosDeseados(updatedList);
+  useEffect(() => {
+    const fetchwishItems = async () => {
+      try {
+        const items = await AsyncStorage.getItem('wishItems');
+        if (items !== null) {
+          setwishItems(JSON.parse(items));
+        }
+      } catch (error) {
+        console.error('Error fetching wishlist items: ', error);
+      }
+    };
+
+    fetchwishItems();
+  }, []);
+
+  useEffect(() => {
+    const updatewishItems = async () => {
+      await AsyncStorage.setItem('wishItems', JSON.stringify(wishItems));
+    };
+
+    updatewishItems();
+  }, [wishItems]);
+
+  const removeFromwish = async (index: number) => {
+    const newwishItemss = [...wishItems];
+    newwishItemss.splice(index, 1);
+    setwishItems(newwishItemss);
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Wish List</Text>
+      <Text style={styles.title}>WishList</Text>
       <ScrollView>
-        {videojuegosDeseados.map((videojuego, index) => (
-          <View key={index} style={styles.card}>
-            <Image
-              source={videojuego.imagenPath}
-              style={styles.image}
-              resizeMode="cover"
-            />
-            <View style={styles.details}>
-              <Text style={styles.name}>{videojuego.nombre}</Text>
-              <Text style={styles.price}>${videojuego.precio}</Text>
-            </View>
-            <TouchableOpacity style={styles.removeButton} onPress={() => removerDeWishlist(videojuego)}>
-              <Text style={styles.removeButtonText}>Remove</Text>
-            </TouchableOpacity>
-          </View>
+        {wishItems.map((item, index) => (
+          <CartItemView key={index} item={item} onRemove={() => removeFromwish(index)} />
         ))}
       </ScrollView>
+    </View>
+  );
+};
+
+interface WishItemProps {
+  item: wishItems;
+  onRemove: () => void;
+}
+
+const CartItemView: React.FC<WishItemProps> = ({ item, onRemove }) => {
+  return (
+    <View style={styles.cartItem}>
+      <Image source={item.image} style={styles.image} />
+      <View style={styles.itemDetails}>
+        <Text style={styles.itemName}>{item.name}</Text>
+        <Text style={styles.itemPrice}>${item.price.toFixed(2)}</Text>
+      </View>
+      <TouchableOpacity style={styles.removeButton} onPress={onRemove}>
+        <Text style={styles.removeButtonText}>Eliminar</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -59,41 +82,37 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 16,
   },
-  card: {
+  cartItem: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 16,
-    backgroundColor: '#FFFFFF',
-    padding: 16,
-    borderRadius: 8,
-    elevation: 4,
   },
   image: {
     width: 50,
     height: 50,
     borderRadius: 25,
   },
-  details: {
+  itemDetails: {
     flex: 1,
     marginLeft: 16,
   },
-  name: {
+  itemName: {
     fontSize: 16,
     fontWeight: 'bold',
   },
-  price: {
+  itemPrice: {
     fontSize: 14,
     marginTop: 4,
   },
   removeButton: {
-    backgroundColor: '#FF0000',
+    backgroundColor: 'red',
     paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 4,
+    paddingVertical: 8,
+    borderRadius: 8,
   },
   removeButtonText: {
-    color: '#FFFFFF',
+    color: 'white',
   },
 });
 
-export default WishlistView;
+export default wishlistview;

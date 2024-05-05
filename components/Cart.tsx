@@ -1,37 +1,43 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface CartItem {
-  nombre: string;
-  imagen: any; // Use any for simplicity, replace it with the actual type of your image paths
-  precio: number;
+  name: string;
+  image: any; // Utiliza el tipo adecuado para las imágenes
+  price: number;
 }
 
-const ShoppingCartView: React.FC = () => {
-  const cartItems: CartItem[] = [
-    {
-      nombre: 'Halo Infinite Xbox Collector Steelbook Edition',
-      imagen: require('../assets/images/haloinfinite.jpg'),
-      precio: 2500.00,
-    },
-    {
-      nombre: 'Halo 5',
-      imagen: require('../assets/images/halo5.jpg'),
-      precio: 2500.00,
-    },
-    {
-      nombre: 'Halo 4',
-      imagen: require('../assets/images/halo4.jpg'),
-      precio: 1999.99,
-    },
-  ];
+const CartView: React.FC = () => {
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
 
-  const calculateTotal = (): number => {
-    let total = 0;
-    cartItems.forEach(item => {
-      total += item.precio;
-    });
-    return total;
+  useEffect(() => {
+    const fetchCartItems = async () => {
+      try {
+        const items = await AsyncStorage.getItem('cartItems');
+        if (items !== null) {
+          setCartItems(JSON.parse(items));
+        }
+      } catch (error) {
+        console.error('Error fetching cart items: ', error);
+      }
+    };
+
+    fetchCartItems();
+  }, []);
+
+  useEffect(() => {
+    const updateCartItems = async () => {
+      await AsyncStorage.setItem('cartItems', JSON.stringify(cartItems));
+    };
+
+    updateCartItems();
+  }, [cartItems]);
+
+  const removeFromCart = async (index: number) => {
+    const newCartItems = [...cartItems];
+    newCartItems.splice(index, 1);
+    setCartItems(newCartItems);
   };
 
   return (
@@ -39,37 +45,28 @@ const ShoppingCartView: React.FC = () => {
       <Text style={styles.title}>Shopping Cart</Text>
       <ScrollView>
         {cartItems.map((item, index) => (
-          <ShoppingCartItem key={index} productName={item.nombre} price={item.precio} image={item.imagen} />
+          <CartItemView key={index} item={item} onRemove={() => removeFromCart(index)} />
         ))}
       </ScrollView>
-      <View style={styles.bottomBar}>
-        <Text style={styles.totalText}>Total: ${calculateTotal().toFixed(2)}</Text>
-        <TouchableOpacity style={styles.proceedButton} onPress={() => {}}>
-          <Text style={styles.buttonText}>Proceed to Payment</Text>
-        </TouchableOpacity>
-      </View>
     </View>
   );
 };
 
-const ShoppingCartItem: React.FC<CartItem> = ({ productName, price, image }) => {
-  const [quantity, setQuantity] = React.useState(1);
+interface CartItemProps {
+  item: CartItem;
+  onRemove: () => void;
+}
 
+const CartItemView: React.FC<CartItemProps> = ({ item, onRemove }) => {
   return (
-    <View style={styles.card}>
-      <Image source={image} style={styles.image} resizeMode="cover" />
+    <View style={styles.cartItem}>
+      <Image source={item.image} style={styles.image} />
       <View style={styles.itemDetails}>
-        <Text style={styles.itemName}>{productName}</Text>
-        <Text style={styles.itemPrice}>${price.toFixed(2)}</Text>
-        <View style={styles.quantityContainer}>
-          <Text>Amount: </Text>
-          <TouchableOpacity onPress={() => setQuantity(quantity + 1)}>
-            <Text>{quantity}</Text>
-          </TouchableOpacity>
-        </View>
+        <Text style={styles.itemName}>{item.name}</Text>
+        <Text style={styles.itemPrice}>${item.price.toFixed(2)}</Text>
       </View>
-      <TouchableOpacity style={styles.removeButton} onPress={() => {}}>
-        <Text style={styles.buttonText}>Delete</Text>
+      <TouchableOpacity style={styles.removeButton} onPress={onRemove}>
+        <Text style={styles.removeButtonText}>Eliminar</Text>
       </TouchableOpacity>
     </View>
   );
@@ -85,14 +82,10 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 16,
   },
-  card: {
+  cartItem: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 16,
-    backgroundColor: '#FFFFFF',
-    padding: 16,
-    borderRadius: 8,
-    elevation: 4,
   },
   image: {
     width: 50,
@@ -111,38 +104,15 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginTop: 4,
   },
-  quantityContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
   removeButton: {
-    backgroundColor: '#FF0000',
+    backgroundColor: 'red',
     paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 4,
-  },
-  buttonText: {
-    color: '#FFFFFF',
-  },
-  bottomBar: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: 16,
-    paddingVertical: 16,
-    borderTopWidth: 1,
-    borderTopColor: '#CCCCCC',
-  },
-  totalText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  proceedButton: {
-    backgroundColor: '#007AFF',
-    paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 8,
   },
+  removeButtonText: {
+    color: 'white',
+  },
 });
 
-export default ShoppingCartView;
+export default CartView;

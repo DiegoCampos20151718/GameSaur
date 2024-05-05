@@ -5,6 +5,16 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import WishList from '../components/WishList';
 import ShoppingCartView from '../components/Cart';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { createStackNavigator } from '@react-navigation/stack';
+import Search from './Search';
+import ProdInfo from './ProdInfo';
+
+export type RootStackParamList = {
+  ProdInfo: { item: Product };
+};
+
+const Stack = createStackNavigator();
 
 type JsonPlaceholder = {
   id: string;
@@ -15,6 +25,7 @@ type JsonPlaceholder = {
 }
 
 const fetchData = async () => {
+  // await AsyncStorage.clear();
   const response = await fetch('http://localhost/geingeemu/public/api/videogame_index');
   return await response.json();
 }
@@ -30,7 +41,7 @@ const HomeView = ({ data }: { data: JsonPlaceholder[] }) => {
   const _buildImageWithText = (imagePath: ImageSourcePropType, text: string, textP: string, onPress: () => void) => (
     <TouchableOpacity onPress={onPress}>
       <View style={styles.imageContainer}>
-        <Image source={imagePath} style={styles.image} />
+        <Image source={`http://localhost/geingeemu/public/${imagePath}`} style={styles.image} />
         <View style={styles.textContainer}>
           <Text style={styles.productName} numberOfLines={2} ellipsizeMode="tail">{text}</Text>
           <Text style={styles.price}>{textP.length > 8 ? textP.substring(0, 8) : textP}</Text>
@@ -46,8 +57,8 @@ const HomeView = ({ data }: { data: JsonPlaceholder[] }) => {
   return (
     <View style={styles.container}>
       <ScrollView>
-      <TouchableOpacity onPress={handleSearchPress} style={styles.searchBarContainer}>
-      <TextInput
+        <TouchableOpacity onPress={handleSearchPress} style={styles.searchBarContainer}>
+          <TextInput
             style={styles.searchInput}
             placeholder="Search"
             onChangeText={setSearchQuery}
@@ -56,9 +67,9 @@ const HomeView = ({ data }: { data: JsonPlaceholder[] }) => {
           />
         </TouchableOpacity>
 
-        <Image source={require('../assets/images/banner.png')} style={{width: '100%', height: 125}} />
+        <Image source={require('../assets/images/banner.png')} style={{ width: '100%', height: 125 }} />
 
-        <Image source={require('../assets/images/brands.png')} style={{width: '100%', height: 100, marginTop: 20}} />
+        <Image source={require('../assets/images/brands.png')} style={{ width: '100%', height: 100, marginTop: 20 }} />
 
         <Text style={styles.sectionHeader}>Featured</Text>
         <ScrollView horizontal={true}>
@@ -78,7 +89,7 @@ const HomeView = ({ data }: { data: JsonPlaceholder[] }) => {
           <View style={{ flexDirection: 'row' }}>
             {filteredData.map(item => (
               <View style={{ paddingRight: 16 }} key={item.id}>
-                {_buildImageWithText(item.image, item.name, `$${item.price*0.9}`, () => {
+                {_buildImageWithText(item.image, item.name, `$${item.price * 0.9}`, () => {
                   navigation.navigate('ProdInfo', { item });
                 })}
               </View>
@@ -92,9 +103,20 @@ const HomeView = ({ data }: { data: JsonPlaceholder[] }) => {
 
 const MainScreen = () => {
   const [data, setData] = useState<JsonPlaceholder[]>([]);
+  const [role, setRole] = useState(false);
 
   useEffect(() => {
     fetchData().then(setData);
+  }, []);
+
+  useEffect(() => {
+    const fetchUserRole = async () => {
+      const storedUserRole = await AsyncStorage.getItem('role');
+      if (storedUserRole == 1) {
+        setRole(true);
+      }
+    };
+    fetchUserRole();
   }, []);
 
   const Tab = createBottomTabNavigator();
@@ -128,30 +150,49 @@ const MainScreen = () => {
           ),
         }}
       />
-      <Tab.Screen
-        name="Sell Games"
-        component={HomeView}  // Assume this component similarly needs data
-        options={{
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="pricetag" color={color} size={25} />
-          ),
-        }}
-      />
+      {role ? (
+        <Tab.Screen
+          name="Sell Games"
+          component={WishList}  // Assume this component similarly needs data
+          options={{
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons name="pricetag" color={color} size={25} />
+            ),
+          }}
+        />
+      ) :
+        <></>
+      }
     </Tab.Navigator>
   );
+}
+
+const StackScreen = () => {
+
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerShown: false
+      }}
+    >
+      <Stack.Screen name="Home" component={MainScreen} />
+      <Stack.Screen name="Search" component={Search} />
+      <Stack.Screen name="ProdInfo" component={ProdInfo} />
+    </Stack.Navigator>
+  );
+
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    margin: 16,
-    backgroundColor: '#fff'
+    marginLeft: 16,
+    marginRight: 16,
   },
   searchBarContainer: {
-    borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 4,
-    marginBottom: 16
+    marginTop: 10
   },
   searchInput: {
     borderWidth: 1,
@@ -159,7 +200,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     padding: 8,
     marginBottom: 16,
-    height: 48  // Optional: Adjust the height to suit your design
+    height: 35  // Optional: Adjust the height to suit your design
   },
   imageContainer: {
     marginRight: 16,
@@ -191,4 +232,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default MainScreen;
+export default StackScreen;

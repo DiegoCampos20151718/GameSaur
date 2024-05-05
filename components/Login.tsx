@@ -23,7 +23,6 @@ const LoginScreen = ({ navigation }) => {
       Alert.alert('Error', 'Please enter a valid email');
       return;
     }
-
     setLoading(true);
     try {
       const response = await fetch('http://localhost/geingeemu/public/api/login', {
@@ -42,11 +41,13 @@ const LoginScreen = ({ navigation }) => {
         Alert.alert('Login Error', `Server responded with status: ${response.status}`);
         return;
       }
-      await AsyncStorage.setItem('authToken', json.token); // Assuming 'token' is the correct field
-      login(json.data.token); // Authenticates the session with the token
-      const id = json.data.id; // Assuming 'id' is received as part of the data
-      await AsyncStorage.setItem('userId', id.toString()); // Store user id in AsyncStorage
-      console.log(json);
+      await AsyncStorage.setItem('authToken', json.token);
+      login(json.data.token);
+      const id = json.data.id;
+      await AsyncStorage.setItem('userId', id.toString());
+      const role = json.data.role;
+      await AsyncStorage.setItem('role', role);
+      console.log(json.data);
       navigation.navigate('Profile', { id });
     } catch (error) {
       Alert.alert('Login Error', 'Unable to connect to the server');

@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, View, Text, Image, TouchableOpacity, ScrollView, ImageSourcePropType } from 'react-native';
+import { StyleSheet, View, Text, Image, TouchableOpacity, ScrollView, ImageSourcePropType, Button } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from './App';
 import { useNavigation } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
 
 
 type ProdInfoScreenNavigationProp = StackNavigationProp<RootStackParamList, 'ProdInfo'>;
@@ -27,7 +28,7 @@ const ProdInfo: React.FC<Props> = ({ navigation, route }) => {
   const [key, setKey] = useState(Date.now().toString());
   const [isInWishlist, setIsInWishlist] = useState(false);
 
-  
+
 
   const toggleWishlist = async (item: Product) => {
     try {
@@ -63,6 +64,14 @@ const ProdInfo: React.FC<Props> = ({ navigation, route }) => {
 
   return (
     <ScrollView key={key} contentContainerStyle={styles.container}>
+      <TouchableOpacity onPress={() => navigation.goBack()}
+      style={{
+        marginBottom: 10
+      }}
+      >
+        <Ionicons name="arrow-undo-sharp" size={25} />
+        <Text>Go back</Text>
+      </TouchableOpacity>
       <View style={styles.header}>
         <Text style={styles.headerText}>{item.name}</Text>
         <Text style={styles.price}>${item.price}</Text>
@@ -92,7 +101,7 @@ const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     backgroundColor: '#f9f9f9',
-    padding: 20,
+    padding: 16,
   },
   header: {
     backgroundColor: '#ffffff',

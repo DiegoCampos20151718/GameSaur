@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView, Image, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 
 interface JsonPlaceholder {
   id: string;
@@ -10,8 +11,21 @@ interface JsonPlaceholder {
   image: string;
   description: string;
   price: number;
-  id_user: number;  // Cambio a `id_user` que es el campo correcto
+  id_user: number;
 }
+
+const deleteGame = async (game: JsonPlaceholder, setGames: React.Dispatch<React.SetStateAction<JsonPlaceholder[]>>, token: string) => {
+  try {
+    await axios.delete(`http://localhost/geingeemu/public/api/destroy/${game.id}`, {
+      headers: { 'Authorization': `Bearer ${token}` },
+    });
+    Alert.alert('Game Deleted', 'The game has been successfully deleted.');
+    setGames((prevGames) => prevGames.filter(g => g.id !== game.id)); // Remove the game from the state
+  } catch (error) {
+    console.error('Delete error:', error);
+    Alert.alert('Error', 'Failed to delete the game. Please try again.');
+  }
+};
 
 const fetchData = async () => {
   const url = `http://localhost/geingeemu/public/api/videogame_index`;
@@ -19,37 +33,6 @@ const fetchData = async () => {
   const data = await response.json();
   console.log("Data from API:", data);  // Verificación de los datos recibidos
   return data;
-}
-
-const GamesView = ({ data, userId }: { data: JsonPlaceholder[], userId: string }) => {
-  const navigation = useNavigation();
-
-  // Convierte `userId` a número porque `id_user` en los datos es un número
-  const userNumericId = parseInt(userId, 10);
-  const filteredGames = data.filter(game => game.id_user === userNumericId);
-
-  const renderGameItem = (game: JsonPlaceholder) => (
-    <TouchableOpacity key={game.id} onPress={() => navigation.navigate('GameDetails', { game })}>
-      <View style={styles.gameItem}>
-        <Image source={{ uri: game.image }} style={styles.image} />
-        <Text style={styles.name}>{game.name}</Text>
-        <Text style={styles.price}>${game.price}</Text>
-      </View>
-    </TouchableOpacity>
-  );
-
-  return (
-    <View style={styles.container}>
-      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.goBack}>
-        <Ionicons name="arrow-back" size={25} />
-        <Text>Back</Text>
-      </TouchableOpacity>
-      <Text style={styles.header}>Your Games</Text>
-      <ScrollView contentContainerStyle={styles.gamesContainer}>
-        {filteredGames.length > 0 ? filteredGames.map(renderGameItem) : <Text>No games available for this user.</Text>}
-      </ScrollView>
-    </View>
-  );
 }
 
 const MainScreen = () => {
@@ -69,9 +52,40 @@ const MainScreen = () => {
     fetchData().then(setGames);
   }, []);
 
+  const navigation = useNavigation();
+
+  const renderGameItem = (game: JsonPlaceholder, token: string) => (
+    <View key={game.id} style={styles.gameItem}>
+      <TouchableOpacity onPress={() => navigation.navigate('GameDetails', { game })}>
+        <Image source={{ uri: game.image }} style={styles.image} />
+        <Text style={styles.name}>{game.name}</Text>
+        <Text style={styles.price}>${game.price}</Text>
+      </TouchableOpacity>
+      <TouchableOpacity 
+        onPress={() => deleteGame(game, setGames, token)}
+        style={styles.deleteButton}>
+        <Ionicons name="trash-outline" size={25} color="red" />
+      </TouchableOpacity>
+    </View>
+  );
+
   return (
     <View style={{ flex: 1 }}>
-      {userId && <GamesView data={games} userId={userId} />}
+      {userId && 
+        <View style={styles.container}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.goBack}>
+            <Ionicons name="arrow-back" size={25} />
+            <Text>Back</Text>
+          </TouchableOpacity>
+          <Text style={styles.header}>Your Games</Text>
+          <ScrollView contentContainerStyle={styles.gamesContainer}>
+            {games.filter(game => game.id_user === parseInt(userId, 10)).length > 0 ? 
+              games.filter(game => game.id_user === parseInt(userId, 10)).map(game => renderGameItem(game, 'YOUR_TOKEN_HERE')) : 
+              <Text>No games available for this user.</Text>
+            }
+          </ScrollView>
+        </View>
+      }
     </View>
   );
 }
@@ -111,7 +125,12 @@ const styles = StyleSheet.create({
   },
   gamesContainer: {
     alignItems: 'center',
-  }
+  },
+  deleteButton: {
+    position: 'absolute',
+    right: 10,
+    top: 10,
+  },
 });
 
 export default MainScreen;

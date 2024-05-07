@@ -15,7 +15,7 @@ interface UserData {
 }
 
 const Profile: React.FC = ({ navigation }) => {
-  const token = useToken();
+  const token = useToken();  // Token fetched using custom hook
   const [userId, setUserId] = useState<string | null>(null);
   const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -23,36 +23,16 @@ const Profile: React.FC = ({ navigation }) => {
 
   useEffect(() => {
     const fetchUserId = async () => {
-      const storedUserId = await AsyncStorage.getItem('userId');
+      const storedUserId = await AsyncStorage.getItem('userId');  // Retrieve the user ID from AsyncStorage
       setUserId(storedUserId);
     };
-    fetchUserId();
+
+    fetchUserId();  // Call the async function to fetch the user ID
   }, []);
 
   useEffect(() => {
-    const fetchUserId = async () => {
-      const storedUserId = await AsyncStorage.getItem('userId');
-      console.log("Retrieved userId:", storedUserId); // Debug: Verificar el valor de userId obtenido
-      if (storedUserId !== null) {
-        setUserId(storedUserId);
-      } else {
-        console.log("No userId found in storage."); // Informar si no hay userId
-        setLoading(false); // Detener el indicador de carga si no hay userId
-      }
-    };
-  
-    fetchUserId();
-  }, []);
-  
-  useEffect(() => {
-    // Only proceed if both userId and token are valid and not null
-    if (!userId || !token) {
-      console.log("Waiting for userId or token:", userId, token); // Debug: Check if either is missing
-      return;
-    }
-  
-    console.log("Proceeding with userId and token:", userId, token); // Debug: Confirm both are present
-  
+    if (!userId || !token) return; // Only proceed if both userId and token are available
+
     const getUserDetails = async () => {
       try {
         const response = await axios.get(`http://localhost/geingeemu/public/api/userview/${userId}`, {
@@ -60,7 +40,6 @@ const Profile: React.FC = ({ navigation }) => {
             'Authorization': `Bearer ${token}`,
           },
         });
-        console.log("API response:", response.data); // Debug: View API response
         setUserData(response.data);
         setLoading(false);
       } catch (error) {
@@ -69,35 +48,48 @@ const Profile: React.FC = ({ navigation }) => {
         setLoading(false);
       }
     };
-  
+
     getUserDetails();
-  }, [userId, token]); // Depend on userId and token
-    
+  }, [userId, token]);  // React when userId or token changes
+
+
+
+  const ViewBilings = () => {
+    navigation.navigate('Biling', { userId });
+  };
+
+  const ViewGamesStore = () => {
+    navigation.navigate('Games', { userId });
+  };
+
+  const ViewFormGame = () => {
+    navigation.navigate('Addgame', { userId });
+  };
+
 
   return (
-    <View style={styles.container}>
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
       {loading ? (
-        <View style={styles.loadingContainer}>
-          <Text style={styles.loadingText}>Loading...</Text>
+        <View style={styles.placeholder}>
+          <Text>Loading...</Text>
         </View>
       ) : error ? (
-        <Text style={styles.errorText}>{error}</Text>
+        <Text style={{ color: 'red', marginBottom: 20 }}>{error}</Text>
       ) : userData ? (
-        <View style={styles.profileContainer}>
-          <Text style={styles.profileHeader}>User Profile</Text>
-          <Text style={styles.profileText}>Name: {userData.firstname} {userData.lastname}</Text>
-          <Text style={styles.profileText}>Address: {userData.address}</Text>
-          <Text style={styles.profileText}>Birthdate: {userData.birthdate}</Text>
-          <Text style={styles.profileText}>Email: {userData.email}</Text>
-          <Text style={styles.profileText}>Role: {userData.role}</Text>
-          <View style={styles.buttonContainer}>
-            <Button title="View Billings" onPress={() => navigation.navigate('Billing', { userId })} color="#007bff" />
-            <Button title="View Games" onPress={() => navigation.navigate('Games', { userId })} color="#007bff" />
-            <Button title="Add Game" onPress={() => navigation.navigate('AddGame', { userId })} color="#007bff" />
-          </View>
+        <View style={styles.container}>
+          <Text style={{ fontSize: 24 }}>User Profile</Text>
+          <Text>Name: {userData.firstname} {userData.lastname}</Text>
+          <Text>address: {userData.address}</Text>
+          <Text>birthdate: {userData.birthdate}</Text>
+          <Text>email: {userData.email}</Text>
+          <Text>role: {userData.role}</Text>
+
+          <Button title="View Bilings" onPress={ViewBilings} color="#007bff" />
+          <Button title="View Games" onPress={ViewGamesStore} color="#007bff" />
+          <Button title="Game Form add" onPress={ViewFormGame} color="#007bff" />
         </View>
       ) : (
-        <Text style={styles.noDataText}>No user data available.</Text>
+        <Text>No user data available.</Text>
       )}
     </View>
   );

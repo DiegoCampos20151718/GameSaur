@@ -15,7 +15,7 @@ interface UserData {
 }
 
 const Profile: React.FC = ({ navigation }) => {
-  const token = useToken();  // Token fetched using custom hook
+  const token = useToken();
   const [userId, setUserId] = useState<string | null>(null);
   const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -23,16 +23,36 @@ const Profile: React.FC = ({ navigation }) => {
 
   useEffect(() => {
     const fetchUserId = async () => {
-      const storedUserId = await AsyncStorage.getItem('userId');  // Retrieve the user ID from AsyncStorage
+      const storedUserId = await AsyncStorage.getItem('userId');
       setUserId(storedUserId);
     };
-
-    fetchUserId();  // Call the async function to fetch the user ID
+    fetchUserId();
   }, []);
 
   useEffect(() => {
-    if (!userId || !token) return; // Only proceed if both userId and token are available
-
+    const fetchUserId = async () => {
+      const storedUserId = await AsyncStorage.getItem('userId');
+      console.log("Retrieved userId:", storedUserId); // Debug: Verificar el valor de userId obtenido
+      if (storedUserId !== null) {
+        setUserId(storedUserId);
+      } else {
+        console.log("No userId found in storage."); // Informar si no hay userId
+        setLoading(false); // Detener el indicador de carga si no hay userId
+      }
+    };
+  
+    fetchUserId();
+  }, []);
+  
+  useEffect(() => {
+    // Only proceed if both userId and token are valid and not null
+    if (!userId || !token) {
+      console.log("Waiting for userId or token:", userId, token); // Debug: Check if either is missing
+      return;
+    }
+  
+    console.log("Proceeding with userId and token:", userId, token); // Debug: Confirm both are present
+  
     const getUserDetails = async () => {
       try {
         const response = await axios.get(`http://localhost/geingeemu/public/api/userview/${userId}`, {
@@ -40,6 +60,7 @@ const Profile: React.FC = ({ navigation }) => {
             'Authorization': `Bearer ${token}`,
           },
         });
+        console.log("API response:", response.data); // Debug: View API response
         setUserData(response.data);
         setLoading(false);
       } catch (error) {
@@ -48,47 +69,35 @@ const Profile: React.FC = ({ navigation }) => {
         setLoading(false);
       }
     };
+  
     getUserDetails();
-  }, [userId, token]);  // React when userId or token changes
-
-
-
-  const ViewBilings = () => {
-    navigation.navigate('Biling', { userId });
-  };
-
-  const ViewGamesStore = () => {
-    navigation.navigate('Games', { userId });
-  };
-
-  const ViewFormGame = () => {
-    navigation.navigate('Addgame', { userId });
-  };
-
+  }, [userId, token]); // Depend on userId and token
+    
 
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+    <View style={styles.container}>
       {loading ? (
-        <View style={styles.placeholder}>
-          <Text>Loading...</Text>
+        <View style={styles.loadingContainer}>
+          <Text style={styles.loadingText}>Loading...</Text>
         </View>
       ) : error ? (
-        <Text style={{ color: 'red', marginBottom: 20 }}>{error}</Text>
+        <Text style={styles.errorText}>{error}</Text>
       ) : userData ? (
-        <View style={styles.container}>
-          <Text style={{ fontSize: 24 }}>User Profile</Text>
-          <Text>Name: {userData.firstname} {userData.lastname}</Text>
-          <Text>address: {userData.address}</Text>
-          <Text>birthdate: {userData.birthdate}</Text>
-          <Text>email: {userData.email}</Text>
-          <Text>role: {userData.role}</Text>
-
-          <Button title="View Bilings" onPress={ViewBilings} color="#007bff" />
-          <Button title="View Games" onPress={ViewGamesStore} color="#007bff" />
-          <Button title="Game Form add" onPress={ViewFormGame} color="#007bff" />
+        <View style={styles.profileContainer}>
+          <Text style={styles.profileHeader}>User Profile</Text>
+          <Text style={styles.profileText}>Name: {userData.firstname} {userData.lastname}</Text>
+          <Text style={styles.profileText}>Address: {userData.address}</Text>
+          <Text style={styles.profileText}>Birthdate: {userData.birthdate}</Text>
+          <Text style={styles.profileText}>Email: {userData.email}</Text>
+          <Text style={styles.profileText}>Role: {userData.role}</Text>
+          <View style={styles.buttonContainer}>
+            <Button title="View Billings" onPress={() => navigation.navigate('Billing', { userId })} color="#007bff" />
+            <Button title="View Games" onPress={() => navigation.navigate('Games', { userId })} color="#007bff" />
+            <Button title="Add Game" onPress={() => navigation.navigate('AddGame', { userId })} color="#007bff" />
+          </View>
         </View>
       ) : (
-        <Text>No user data available.</Text>
+        <Text style={styles.noDataText}>No user data available.</Text>
       )}
     </View>
   );
@@ -96,24 +105,50 @@ const Profile: React.FC = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   container: {
-    maxWidth: 800,
-    width: '100%',
-    padding: 20,
-    backgroundColor: '#FFF',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
-    alignItems: 'center',
-  },
-  placeholder: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    height: 400,
-    backgroundColor: '#333',
-    color: '#fff',
+    backgroundColor: '#121212',  // Dark background for a gaming vibe
+  },
+  loadingContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  loadingText: {
     fontSize: 20,
-    borderRadius: 8,
+    color: '#ffffff',
+  },
+  errorText: {
+    color: 'red',
+    marginBottom: 20,
+  },
+  profileContainer: {
+    padding: 20,
+    backgroundColor: '#242424',  // Slightly lighter background for content cards
+    borderRadius: 10,
+    width: '90%',  // Use a percentage of width for better responsiveness
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+  },
+  profileHeader: {
+    fontSize: 24,
+    color: '#00ff00',  // Bright accent color
+    marginBottom: 10,
+  },
+  profileText: {
+    fontSize: 18,
+    color: '#ffffff',
+    marginBottom: 5,
+  },
+  noDataText: {
+    fontSize: 16,
+    color: '#ffffff',
+  },
+  buttonContainer: {
+    marginTop: 20,
   }
 });
 

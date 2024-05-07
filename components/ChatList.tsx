@@ -17,23 +17,63 @@ interface Chat {
   date: string;
 }
 
+interface User {
+  id: number;
+  firstname: string;
+  lastname: string;
+}
+
 const ChatList: React.FC = ({ navigation }) => {
   const token = useToken();
   const [chats, setChats] = useState<Chat[]>([]);
   const [loading, setLoading] = useState(true);
+  const [users, setUsers] = useState<User[]>([]);
+  const [games, setGames] = useState<{ [id: number]: string }>({});
+  const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchChats = async () => {
       try {
         setLoading(true);
         const storedUserId = await AsyncStorage.getItem('userId');
+        setUserId(storedUserId);
         if (storedUserId) {
           const userId = BigInt(storedUserId);
           const response = await axios.get<Chat[]>(`http://localhost/geingeemu/public/api/loadchats/${userId}`, {
             headers: { 'Authorization': `Bearer ${token}` },
           });
-          // console.log('Chats recibidos:', response.data);
           setChats(response.data);
+
+          // Obtener los nombres de usuario para id_user1
+          const user1Requests = response.data.map(chat => axios.get<User>(`http://localhost/geingeemu/public/api/userview/${chat.id_user1}`));
+          const usersData1 = await Promise.all(user1Requests);
+          const user1Names = usersData1.map(userResponse => userResponse.data);
+
+          // Obtener los nombres de usuario para id_user2
+          const user2Requests = response.data.map(chat => axios.get<User>(`http://localhost/geingeemu/public/api/userview/${chat.id_user2}`));
+          const usersData2 = await Promise.all(user2Requests);
+          const user2Names = usersData2.map(userResponse => userResponse.data);
+
+          // Combinar nombres de usuario
+          const combinedUsers = response.data.map((chat, index) => ({
+            id: chat.id,
+            firstname1: user1Names[index]?.firstname,
+            lastname1: user1Names[index]?.lastname,
+            firstname2: user2Names[index]?.firstname,
+            lastname2: user2Names[index]?.lastname,
+          }));
+
+          setUsers(combinedUsers);
+
+          // Obtener los nombres de videojuego para id_videogame
+          const gameRequests = response.data.map(chat => axios.get<{ name: string }>(`http://localhost/geingeemu/public/api/ampp/${chat.id_videogame}`));
+          const gamesData = await Promise.all(gameRequests);
+          const gameNames = gamesData.reduce((acc, gameResponse) => {
+            acc[gameResponse.data.id] = gameResponse.data.name;
+            return acc;
+          }, {} as { [id: number]: string });
+
+          setGames(gameNames);
         }
       } catch (error) {
         console.error('Error al cargar los chats:', error);
@@ -49,13 +89,14 @@ const ChatList: React.FC = ({ navigation }) => {
     navigation.navigate('ChatDetails', { chatId });
   };
 
-  const renderCard = ({ item }: { item: Chat }) => (
+  const renderCard = ({ item, index }: { item: Chat; index: number }) => (
     <TouchableOpacity onPress={() => navigateToChatDetail(item.id)}>
       <View style={styles.card}>
-        <Text style={styles.cardText}>ID: {item.id}</Text>
-        <Text style={styles.cardText}>User 1: {item.id_user1}</Text>
-        <Text style={styles.cardText}>User 2: {item.id_user2}</Text>
-        <Text style={styles.cardText}>Videojuego: {item.id_videogame}</Text>
+        {/* <Text style={styles.cardText}>ID: {item.id}</Text> */}
+        {!userId || item.id_user1.toString() !== userId ? (
+          <Text style={styles.cardText}>{users[index]?.firstname1} {users[index]?.lastname1}</Text>
+        ) : <Text style={styles.cardText}>{users[index]?.firstname2} {users[index]?.lastname2}</Text> }
+        <Text style={styles.cardText}>Producto: {games[item.id_videogame]}</Text>
         <Text style={styles.cardText}>Fecha: {item.date}</Text>
       </View>
     </TouchableOpacity>
@@ -77,7 +118,6 @@ const ChatList: React.FC = ({ navigation }) => {
 };
 
 const ChatScreen = () => {
-
   return (
     <Stack.Navigator
       screenOptions={{
@@ -88,7 +128,6 @@ const ChatScreen = () => {
       <Stack.Screen name="ChatDetails" component={ChatDetailScreen} />
     </Stack.Navigator>
   );
-
 }
 
 const styles = StyleSheet.create({

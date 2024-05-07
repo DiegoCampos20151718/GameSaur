@@ -7,6 +7,7 @@ import { RootStackParamList } from './App';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
+import { useToken } from './AuthService';
 
 type ProdInfoScreenNavigationProp = StackNavigationProp<RootStackParamList, 'ProdInfo'>;
 type ProdInfoScreenRouteProp = RouteProp<RootStackParamList, 'ProdInfo'>;
@@ -29,6 +30,8 @@ const ProdInfo: React.FC<Props> = ({ navigation, route }) => {
   const [key, setKey] = useState(Date.now().toString());
   const [isInWishlist, setIsInWishlist] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
+  const token = useToken();  // Token fetched using custom hook
+  const [userData, setUserData] = useState<UserData | null>(null);
 
   useEffect(() => {
     const fetchUserId = async () => {
@@ -71,14 +74,33 @@ const ProdInfo: React.FC<Props> = ({ navigation, route }) => {
     }
   };
 
+  useEffect(() => {
+    const fetchUserId = async () => {
+      const storedUserId = await AsyncStorage.getItem('userId');
+      setUserId(storedUserId);
+    };
+    fetchUserId();
+    const fetchName = async () => {
+      const response = await axios.get(`http://localhost/geingeemu/public/api/userview/${userId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      setUserData(response.data.firstname);
+      console.log(response.data.firstname);
+    }
+    fetchName();
+  }, []);
+
   const createChat = async () => {
     try {
       const newChat = {
         id_user1: userId,
         id_user2: item.id_user,
         id_videogame: item.id,
-        chat: '[{"nombre":"Usuario1","mensaje":"Hola","fecha":"2024-05-06T12:00:00Z"}]',
-        date: '2024-05-06',
+        chat: `[{"name":"${userData}","message":"Hola","date":"2024-05-06T12:00:00Z"}]`,
+        date: '2024-07-05',
+        // date: new Date().toISOString(),
       };
 
       // Enviar la solicitud para crear el nuevo chat

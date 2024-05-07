@@ -1,7 +1,62 @@
-import React from 'react';
-import { StyleSheet, View, Text, TextInput, TouchableOpacity, Image } from 'react-native';
+import React, { useState } from 'react';
+import { StyleSheet, View, Text, TextInput, TouchableOpacity, Image, Alert, ActivityIndicator } from 'react-native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createDrawerNavigator } from '@react-navigation/drawer';
+import { NavigationContainer } from '@react-navigation/native';
+import Registration from './Register';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const LoginScreen = () => {
+const LoginScreen = ({ navigation }) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const validateEmail = (email) => {
+    const re = /\S+@\S+\.\S+/;
+    return re.test(email);
+  };
+
+  const authenticateUser = async (email, password) => {
+    setLoading(true);
+    try {
+      const response = await fetch('http://localhost/geingeemu/public/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: email,
+          password: password,
+        }),
+      });
+      // const json = await response.json();
+      // console.log(json.token);
+      // if (json.success) {
+      //   await AsyncStorage.setItem('userToken', json.token);  // Asumiendo que la API devuelve un 'token'
+        
+        navigation.navigate('Home');
+      // } else {
+      //   Alert.alert('Login Failed', json.message || 'Invalid credentials');
+      // }
+    } catch (error) {
+      console.error('Login Error:', error);
+      Alert.alert('Login Error', 'Unable to connect to the server');
+    }
+    setLoading(false);
+  };
+
+  const handleLogin = () => {
+    if (!email || !password) {
+      Alert.alert('Error', 'Please fill in all fields');
+      return;
+    }
+    if (!validateEmail(email)) {
+      Alert.alert('Error', 'Please enter a valid email');
+      return;
+    }
+    authenticateUser(email, password);
+  };
+
   return (
     <View style={styles.container}>
       <Image source={require('../assets/logo.png')} style={styles.logo} />
@@ -11,23 +66,28 @@ const LoginScreen = () => {
         style={styles.input}
         placeholder="e-mail"
         placeholderTextColor="#9B9B9B"
+        value={email}
+        onChangeText={setEmail}
       />
       <TextInput
         style={styles.input}
         placeholder="Password"
         placeholderTextColor="#9B9B9B"
         secureTextEntry
+        value={password}
+        onChangeText={setPassword}
       />
-      <TouchableOpacity style={styles.loginButton}>
-        <Text style={styles.loginButtonText}>Login</Text>
-      </TouchableOpacity>
-      <View style={styles.keepSessionContainer}>
-        <TouchableOpacity>
-          <Text style={styles.keepSessionText}>Keep open the session</Text>
+      {loading ? (
+        <ActivityIndicator size="large" color="#007AFF" />
+      ) : (
+        <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
+          <Text style={styles.loginButtonText}>Login</Text>
         </TouchableOpacity>
-      </View>
+      )}
       <TouchableOpacity>
-        <Text style={styles.signUpText}>¿No tienes cuenta? Haz click aquí</Text>
+        <Text style={styles.signUpText} onPress={() => navigation.navigate('Register')}>
+          Don't have an account? Click here
+        </Text>
       </TouchableOpacity>
     </View>
   );

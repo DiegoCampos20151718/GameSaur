@@ -1,95 +1,145 @@
-import React from 'react';
-import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { View, TextInput, Button, Text, StyleSheet, ScrollView } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
-const Registration = () => {
-  return (
-    <View style={styles.container}>
-      <Image source={require('../assets/logo.png')} style={styles.logo} />
-      <Text style={styles.title}>Register</Text>
-      <TextInput style={styles.input} placeholder="User name" />
-      <TextInput style={styles.input} placeholder="E-mail" />
-      <TextInput style={styles.input} placeholder="Password" secureTextEntry />
-      <TextInput style={styles.input} placeholder="Confirm password" secureTextEntry />
-      <View style={styles.rowContainer}>
-        <TextInput style={[styles.input, styles.halfWidth]} placeholder="Country" />
-        <TextInput style={[styles.input, styles.halfWidth]} placeholder="City" />
-      </View>
-      <TextInput style={styles.input} placeholder="Address" />
-      <View style={styles.rowContainer}>
-        <TextInput style={[styles.input, styles.halfWidth]} placeholder="Postal code" />
-        <View style={styles.checkboxContainer}>
-          <TouchableOpacity style={styles.checkbox} />
-          <Text style={styles.checkboxLabel}>Accept terms and conditions</Text>
-        </View>
-      </View>
-      <TouchableOpacity style={styles.signUpButton}>
-        <Text style={styles.signUpButtonText}>Sign Up</Text>
-      </TouchableOpacity>
-    </View>
-  );
-};
+function Register() {
+    const [formValue, setFormValue] = useState({
+        firstname: '',
+        lastname: '',
+        birthdate: '',
+        address: '',
+        phone_number: '',
+        email: '',
+        password: '',
+        c_password: '',
+        role: '0',
+    });
+
+    const navigation = useNavigation();
+
+    const onChange = (name, value) => {
+        setFormValue({ ...formValue, [name]: value });
+    };
+
+    const handlePhoneNumberChange = (value) => {
+        const inputPhoneNumber = value.replace(/\D/g, '');
+        const formattedPhoneNumber = formatPhoneNumber(inputPhoneNumber);
+        setFormValue({ ...formValue, phone_number: formattedPhoneNumber });
+    };
+
+    const formatPhoneNumber = (phone_number) => {
+        const cleaned = ('' + phone_number).replace(/\D/g, '');
+        const match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
+
+        if (match) {
+            return `${match[1]}-${match[2]}-${match[3]}`;
+        }
+
+        return phone_number;
+    };
+
+    const handleSubmit = async () => {
+      const formData = new FormData();
+      Object.keys(formValue).forEach(key => {
+          formData.append(key, formValue[key]);
+      });
+  
+      try {
+          const response = await fetch("http://localhost/geingeemu/public/api/register", {
+              method: 'POST',
+              body: formData,
+              headers: {
+                  'Accept': 'application/json'
+              }
+          });
+          
+          const textResponse = await response.text(); // Get response as text
+          console.log("Raw response:", textResponse);
+  
+          try {
+              const jsonResponse = JSON.parse(textResponse); // Try parsing as JSON
+              console.log("JSON response:", jsonResponse);
+              navigation.navigate("Home");
+          } catch (jsonError) {
+              console.error("Error parsing JSON:", jsonError, textResponse);
+          }
+      } catch (error) {
+          console.error("Network error:", error);
+      }
+  };
+  
+
+    return (
+        <ScrollView style={styles.container}>
+            <TextInput
+                style={styles.input}
+                placeholder="Enter first name"
+                value={formValue.firstname}
+                onChangeText={(text) => onChange('firstname', text)}
+            />
+            <TextInput
+                style={styles.input}
+                placeholder="Enter last name"
+                value={formValue.lastname}
+                onChangeText={(text) => onChange('lastname', text)}
+            />
+            <TextInput
+                style={styles.input}
+                placeholder="yyyy-mm-dd"
+                value={formValue.birthdate}
+                onChangeText={(text) => onChange('birthdate', text)}
+            />
+            <TextInput
+                style={styles.input}
+                placeholder="1234 Main St"
+                value={formValue.address}
+                onChangeText={(text) => onChange('address', text)}
+            />
+            <TextInput
+                style={styles.input}
+                placeholder="000-000-0000"
+                value={formValue.phone_number}
+                onChangeText={handlePhoneNumberChange}
+            />
+            <TextInput
+                style={styles.input}
+                placeholder="Enter email"
+                value={formValue.email}
+                onChangeText={(text) => onChange('email', text)}
+            />
+            <TextInput
+                style={styles.input}
+                placeholder="Password"
+                secureTextEntry={true}
+                value={formValue.password}
+                onChangeText={(text) => onChange('password', text)}
+            />
+            <TextInput
+                style={styles.input}
+                placeholder="Confirm Password"
+                secureTextEntry={true}
+                value={formValue.c_password}
+                onChangeText={(text) => onChange('c_password', text)}
+            />
+            <Button
+                title="Submit"
+                onPress={handleSubmit}
+            />
+        </ScrollView>
+    );
+}
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#F5F5F5',
-  },
-  logo: {
-    width: 80,
-    height: 80,
-    marginBottom: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
-  input: {
-    width: '80%',
-    height: 40,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
-    marginBottom: 10,
-    paddingHorizontal: 10,
-  },
-  rowContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '80%',
-    marginBottom: 10,
-  },
-  halfWidth: {
-    width: '48%',
-  },
-  checkboxContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  checkbox: {
-    width: 20,
-    height: 20,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
-    marginRight: 10,
-  },
-  checkboxLabel: {
-    fontSize: 16,
-  },
-  signUpButton: {
-    backgroundColor: '#007AFF',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-  },
-  signUpButtonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
+    container: {
+        flex: 1,
+        padding: 20,
+    },
+    input: {
+        height: 40,
+        margin: 12,
+        borderWidth: 1,
+        padding: 10,
+    },
 });
 
-export default Registration;
+export default Register;

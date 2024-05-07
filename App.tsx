@@ -7,7 +7,6 @@ import Home from './components/Home';
 import Profile from './components/Profile';
 import BilingView from './components/BilingView';
 import GamesUser from './components/GamesUser';
-import WishList from './components/WishList';
 import Addgame from './components/Addgame';
 import ChatScreen from './components/ChatList';
 import { AuthProvider } from './components/AuthService';
@@ -41,7 +40,11 @@ const App = () => {
             drawerItemStyle: { height: 0 }
           }}
           />
-          <Drawer.Screen name="Addgame" component={Addgame} />
+          <Drawer.Screen name="Addgame" component={Addgame}
+          options={{
+            drawerItemStyle: { height: 0 }
+          }}
+          />
         </Drawer.Navigator>
       </AuthProvider>
     </NavigationContainer>

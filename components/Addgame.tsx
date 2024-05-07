@@ -112,10 +112,10 @@ const VideoGameForm: React.FC<VideoGameFormProps> = ({ route }) => {
 
   return (
     <ScrollView style={styles.container}>
-      <TextInput placeholder="Nombre" value={formData.name} onChangeText={(text) => handleInputChange('name', text)} style={styles.input} />
-      <TextInput placeholder="Descripción" value={formData.description} onChangeText={(text) => handleInputChange('description', text)} multiline style={styles.input} />
+      <TextInput placeholder="Name" value={formData.name} onChangeText={(text) => handleInputChange('name', text)} style={styles.input} />
+      <TextInput placeholder="Description" value={formData.description} onChangeText={(text) => handleInputChange('description', text)} multiline style={styles.input} />
       <TextInput placeholder="Stock" value={formData.stock} onChangeText={(text) => handleInputChange('stock', text)} keyboardType="numeric" style={styles.input} />
-      <TextInput placeholder="Precio" value={formData.price} onChangeText={(text) => handleInputChange('price', text)} keyboardType="numeric" style={styles.input} />
+      <TextInput placeholder="Price" value={formData.price} onChangeText={(text) => handleInputChange('price', text)} keyboardType="numeric" style={styles.input} />
       <Picker selectedValue={formData.type} onValueChange={(value) => handleInputChange('type', value)}>
         <Picker.Item label="Videogame" value="true" />
         <Picker.Item label="Console" value="false" />
@@ -126,7 +126,7 @@ const VideoGameForm: React.FC<VideoGameFormProps> = ({ route }) => {
       <Text>
         Digital: <Switch value={formData.digital === 'true'} onValueChange={(value) => handleInputChange('digital', value.toString())} />
       </Text>
-      <TextInput placeholder="URL de la imagen" value={formData.image} onChangeText={(text) => handleInputChange('image', text)} style={styles.input} />
+      <TextInput placeholder="Image URL" value={formData.image} onChangeText={(text) => handleInputChange('image', text)} style={styles.input} />
       {/* <TextInput placeholder="ID del usuario" value={formData.id_user} onChangeText={(text) => handleInputChange('id_user', text)} style={styles.input} /> */}
       <Picker
         selectedValue={formData.id_category}

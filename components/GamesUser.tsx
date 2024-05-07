@@ -4,6 +4,11 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import VideoGameEdit from './EditGame';
+import { EditIcon } from '@gluestack-ui/themed';
+import { createStackNavigator } from '@react-navigation/stack';
+
+const Stack = createStackNavigator();
 
 interface JsonPlaceholder {
   id: string;
@@ -54,9 +59,13 @@ const MainScreen = () => {
 
   const navigation = useNavigation();
 
+  const navigateToEditGame = (gameId: string) => {
+    navigation.navigate('EditGame', { gameId });
+  };
+
   const renderGameItem = (game: JsonPlaceholder, token: string) => (
     <View key={game.id} style={styles.gameItem}>
-      <TouchableOpacity onPress={() => navigation.navigate('GameDetails', { game })}>
+      <TouchableOpacity onPress={() => navigateToEditGame(game.id)}>
       <Image source={{ uri: game.image }} style={styles.image} />
         <Text style={styles.name}>{game.name}</Text>
         <Text style={styles.price}>${game.price}</Text>
@@ -87,6 +96,19 @@ const MainScreen = () => {
         </View>
       }
     </View>
+  );
+}
+
+const UserGamesScreen = () => {
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerShown: false
+      }}
+    >
+      <Stack.Screen name="Games" component={MainScreen} />
+      <Stack.Screen name="EditGame" component={VideoGameEdit} />
+    </Stack.Navigator>
   );
 }
 
@@ -133,4 +155,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default MainScreen;
+export default UserGamesScreen;

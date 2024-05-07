@@ -6,7 +6,7 @@ import { RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from './App';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
-
+import axios from 'axios';
 
 type ProdInfoScreenNavigationProp = StackNavigationProp<RootStackParamList, 'ProdInfo'>;
 type ProdInfoScreenRouteProp = RouteProp<RootStackParamList, 'ProdInfo'>;
@@ -17,6 +17,7 @@ type Props = {
 };
 
 type Product = {
+  id: number;
   name: string;
   price: number;
   description: string;
@@ -27,8 +28,16 @@ const ProdInfo: React.FC<Props> = ({ navigation, route }) => {
   const { item } = route.params;
   const [key, setKey] = useState(Date.now().toString());
   const [isInWishlist, setIsInWishlist] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
 
+  useEffect(() => {
+    const fetchUserId = async () => {
+      const storedUserId = await AsyncStorage.getItem('userId');  // Retrieve the user ID from AsyncStorage
+      setUserId(storedUserId);
+    };
 
+    fetchUserId();  // Call the async function to fetch the user ID
+  }, []);
 
   const toggleWishlist = async (item: Product) => {
     try {
@@ -62,18 +71,41 @@ const ProdInfo: React.FC<Props> = ({ navigation, route }) => {
     }
   };
 
+  const createChat = async () => {
+    try {
+      const newChat = {
+        id_user1: userId,
+        id_user2: item.id_user,
+        id_videogame: item.id,
+        chat: '[{"nombre":"Usuario1","mensaje":"Hola","fecha":"2024-05-06T12:00:00Z"}]',
+        date: '2024-05-06',
+      };
+
+      // Enviar la solicitud para crear el nuevo chat
+      await axios.post('http://localhost/geingeemu/public/api/newchat', newChat);
+
+      // Actualizar el estado local o realizar cualquier otra acción necesaria
+
+      // Refrescar la pantalla o navegar a otra pantalla si es necesario
+      setKey(Date.now().toString());
+      // navigation.navigate('ChatList'); // Por ejemplo, navegamos a la lista de chats después de crear uno nuevo
+    } catch (error) {
+      console.error('Error creating chat:', error);
+    }
+  };
+
   return (
     <ScrollView key={key} contentContainerStyle={styles.container}>
       <TouchableOpacity onPress={() => navigation.goBack()}
-      style={{
-        marginBottom: 10
-      }}
+        style={{
+          marginBottom: 10
+        }}
       >
         <Ionicons name="arrow-undo-sharp" size={25} />
         <Text>Go back</Text>
       </TouchableOpacity>
       <View style={styles.header}>
-        <Text style={styles.headerText}>{item.name}</Text>
+        <Text style={styles.headerText}>{item.na}</Text>
         <Text style={styles.price}>${item.price}</Text>
       </View>
 
@@ -92,6 +124,17 @@ const ProdInfo: React.FC<Props> = ({ navigation, route }) => {
         <TouchableOpacity style={styles.button} onPress={() => addToCart(item)}>
           <Text style={styles.buttonText}>Add to Cart</Text>
         </TouchableOpacity>
+
+        <TouchableOpacity onPress={() => navigation.goBack()}
+          style={{
+            marginBottom: 10,
+            alignItems: 'center'
+          }}
+        >
+          <Ionicons name="chatbubble-ellipses-outline" size={25} onPress={createChat} />
+          <Text>Start Chat</Text>
+        </TouchableOpacity>
+
       </View>
     </ScrollView>
   );

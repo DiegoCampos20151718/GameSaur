@@ -8,6 +8,7 @@ import Profile from './components/Profile';
 import BilingView from './components/BilingView';
 import GamesUser from './components/GamesUser';
 import Addgame from './components/Addgame';
+import ChatScreen from './components/ChatList';
 import { AuthProvider } from './components/AuthService';
 const Drawer = createDrawerNavigator();
 // export type RootStackParamList = {
@@ -22,6 +23,7 @@ const App = () => {
         <Drawer.Navigator initialRouteName="Home">
           <Drawer.Screen name="Home" component={Home} />
           <Drawer.Screen name="Profile" component={Profile} />
+          <Drawer.Screen name="Chat" component={ChatScreen} />
           <Drawer.Screen name="Login" component={LoginScreen} />
           <Drawer.Screen name="Register" component={Register} 
           options={{
@@ -38,11 +40,7 @@ const App = () => {
             drawerItemStyle: { height: 0 }
           }}
           />
-          <Drawer.Screen name="Addgame" component={Addgame}
-          options={{
-            drawerItemStyle: { height: 0 }
-          }}
-          />
+          <Drawer.Screen name="Addgame" component={Addgame} />
         </Drawer.Navigator>
       </AuthProvider>
     </NavigationContainer>

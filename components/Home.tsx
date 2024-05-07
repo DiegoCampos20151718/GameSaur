@@ -22,6 +22,7 @@ type JsonPlaceholder = {
   image: string;
   description: string;
   price: number;
+  id_user: number;
 }
 
 const fetchData = async () => {

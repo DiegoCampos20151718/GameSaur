@@ -26,7 +26,7 @@ const GamesUser: React.FC = ({ navigation }) => {
       if (!userId || !token) return;
 
       try {
-        const response = await axios.get<VideoGame>(`http://localhost/geingeemu/public/api/loadgame/${userId}`, {
+        const response = await axios.get<VideoGame[]>(`http://localhost/geingeemu/public/api/loadgame/${userId}`, {
           headers: { 'Authorization': `Bearer ${token}` },
         });
         setVideoGame({

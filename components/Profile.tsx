@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useToken } from './AuthService';
+import { useAuth } from './AuthService';  // Importa useAuth para acceder a logout
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { Button, View, Text, StyleSheet } from 'react-native';
+import { StackActions } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
+
 
 interface UserData {
   firstname: string;
@@ -14,8 +17,9 @@ interface UserData {
   role: string;
 }
 
-const Profile: React.FC = ({ navigation }) => {
-  const token = useToken();
+const Profile: React.FC = ({ }) => {
+  const navigation = useNavigation();
+  const { token, logout } = useAuth();  
   const [userId, setUserId] = useState<string | null>(null);
   const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -47,6 +51,14 @@ const Profile: React.FC = ({ navigation }) => {
     };
     getUserDetails();
   }, [userId, token]);
+  
+  const handleLogout = async () => {
+    await logout();  // Realiza la acción de logout.
+    // Restablece el stack de navegación y navega a la pantalla inicial.
+    navigation.dispatch(
+      StackActions.replace('Home')  // Usa StackActions.replace si está disponible.
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -68,6 +80,7 @@ const Profile: React.FC = ({ navigation }) => {
             <Button title="View Bilings" onPress={() => navigation.navigate('Biling', { userId })} color="#007bff" />
             <Button title="View Games" onPress={() => navigation.navigate('Games', { userId })} color="#007bff" />
             <Button title="Add Game Form" onPress={() => navigation.navigate('Addgame', { userId })} color="#007bff" />
+            <Button title="Log out" onPress={handleLogout} color="#007bff" />
           </View>
         </View>
       ) : (

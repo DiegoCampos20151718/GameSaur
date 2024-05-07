@@ -57,7 +57,7 @@ const MainScreen = () => {
   const renderGameItem = (game: JsonPlaceholder, token: string) => (
     <View key={game.id} style={styles.gameItem}>
       <TouchableOpacity onPress={() => navigation.navigate('GameDetails', { game })}>
-        <Image source={{ uri: game.image }} style={styles.image} />
+      <Image source={{ uri: game.image }} style={styles.image} />
         <Text style={styles.name}>{game.name}</Text>
         <Text style={styles.price}>${game.price}</Text>
       </TouchableOpacity>

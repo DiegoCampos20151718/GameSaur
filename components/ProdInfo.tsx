@@ -7,6 +7,7 @@ import { RootStackParamList } from './App';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
+import { useToken } from './AuthService';
 
 type ProdInfoScreenNavigationProp = StackNavigationProp<RootStackParamList, 'ProdInfo'>;
 type ProdInfoScreenRouteProp = RouteProp<RootStackParamList, 'ProdInfo'>;
@@ -29,15 +30,8 @@ const ProdInfo: React.FC<Props> = ({ navigation, route }) => {
   const [key, setKey] = useState(Date.now().toString());
   const [isInWishlist, setIsInWishlist] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchUserId = async () => {
-      const storedUserId = await AsyncStorage.getItem('userId');  // Retrieve the user ID from AsyncStorage
-      setUserId(storedUserId);
-    };
-
-    fetchUserId();  // Call the async function to fetch the user ID
-  }, []);
+  const token = useToken();  // Token fetched using custom hook
+  const [userData, setUserData] = useState<UserData | null>(null);
 
   const toggleWishlist = async (item: Product) => {
     try {
@@ -71,14 +65,36 @@ const ProdInfo: React.FC<Props> = ({ navigation, route }) => {
     }
   };
 
+  useEffect(() => {
+    const fetchUserId = async () => {
+      const storedUserId = await AsyncStorage.getItem('userId');
+      console.log("Stored UserID:", storedUserId);
+      if (storedUserId !== null) {
+        setUserId(storedUserId);  // Actualizar userId en el estado
+        console.log("Updating userId to:", storedUserId);
+        // Hacer la llamada API después de actualizar el estado
+        const response = await axios.get(`http://localhost/geingeemu/public/api/userview/${storedUserId}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+        setUserData(response.data.firstname);
+        console.log(response.data.firstname);
+      }
+    };
+    fetchUserId();  // Llamar a la función para obtener el userId y hacer la llamada API
+  }, [token]); // Añadir 'token' como dependencia si es necesario para refetch cuando token cambia
+
+
   const createChat = async () => {
     try {
       const newChat = {
         id_user1: userId,
         id_user2: item.id_user,
         id_videogame: item.id,
-        chat: '[{"nombre":"Usuario1","mensaje":"Hola","fecha":"2024-05-06T12:00:00Z"}]',
-        date: '2024-05-06',
+        chat: `[{"name":"${userData}","message":"Hola","date":"2024-05-06T12:00:00Z"}]`,
+        date: '2024-07-05',
+        // date: new Date().toISOString(),
       };
 
       // Enviar la solicitud para crear el nuevo chat

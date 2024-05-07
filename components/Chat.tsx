@@ -3,17 +3,22 @@ import { View, Text, FlatList, StyleSheet, TouchableOpacity, TextInput, Keyboard
 import axios from 'axios';
 import { RouteProp } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useToken } from './AuthService';
 
 interface ChatMessage {
-  nombre: string;
-  mensaje: string;
-  fecha: string;
+  name: string;
+  message: string;
+  date: string;
 }
 
 const ChatDetailScreen: React.FC<{ route: any }> = ({ navigation, route }) => {
   const { chatId } = route.params;
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [newMessage, setNewMessage] = useState('');
+  const [userId, setUserId] = useState<string | null>(null);
+  const token = useToken();  // Token fetched using custom hook
+  const [userData, setUserData] = useState<UserData | null>(null);
 
   useEffect(() => {
     const fetchMessages = async () => {
@@ -22,7 +27,6 @@ const ChatDetailScreen: React.FC<{ route: any }> = ({ navigation, route }) => {
         if (response.data.length > 0) {
           const chatData = response.data[0].chat;
           const parsedChatData: ChatMessage[] = JSON.parse(chatData);
-        //   console.log('Mensajes del chat:', parsedChatData);
           setMessages(parsedChatData);
         }
       } catch (error) {
@@ -33,12 +37,29 @@ const ChatDetailScreen: React.FC<{ route: any }> = ({ navigation, route }) => {
     fetchMessages();
   }, [chatId]);
 
+  useEffect(() => {
+    const fetchUserId = async () => {
+        const storedUserId = await AsyncStorage.getItem('userId');
+        console.log("Stored UserID:", storedUserId);  // Verificación del userId recuperado
+        setUserId(storedUserId);
+        const response = await axios.get(`http://localhost/geingeemu/public/api/userview/${storedUserId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      setUserData(response.data.firstname);
+      console.log(response.data.firstname);
+    };
+    fetchUserId();
+    console.log(userId);
+  }, []);
+
   const handleSend = async () => {
     try {
       const newMessageData: ChatMessage = {
-        nombre: 'Usuario',
-        mensaje: newMessage,
-        fecha: new Date().toISOString(),
+        name: userData, // Establecer el nombre del usuario que envía el mensaje
+        message: newMessage,
+        date: new Date().toISOString(),
       };
 
       const updatedMessages = [...messages, newMessageData];
@@ -54,9 +75,9 @@ const ChatDetailScreen: React.FC<{ route: any }> = ({ navigation, route }) => {
 
   const renderItem = ({ item }: { item: ChatMessage }) => (
     <View style={styles.messageContainer}>
-      <Text style={styles.messageTitle}>{item.nombre}</Text>
-      <Text>{item.mensaje}</Text>
-      <Text style={styles.messageDate}>{item.fecha}</Text>
+      <Text style={styles.messageTitle}>{item.name}</Text>
+      <Text>{item.message}</Text>
+      <Text style={styles.messageDate}>{item.date}</Text>
     </View>
   );
 

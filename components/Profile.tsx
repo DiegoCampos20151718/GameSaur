@@ -48,7 +48,6 @@ const Profile: React.FC = ({ navigation }) => {
         setLoading(false);
       }
     };
-
     getUserDetails();
   }, [userId, token]);  // React when userId or token changes
 

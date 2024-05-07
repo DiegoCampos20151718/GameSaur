@@ -59,7 +59,7 @@ const MainScreen = () => {
   useEffect(() => {
     const fetchUserId = async () => {
       const storedUserId = await AsyncStorage.getItem('userId');
-      console.log("Stored UserID:", storedUserId);  // Verificación del userId recuperado
+      console.log("Stored UserID:", storedUserId);
       setUserId(storedUserId);
     };
     fetchUserId();

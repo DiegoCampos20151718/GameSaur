@@ -53,12 +53,13 @@ const Profile: React.FC = ({ }) => {
   }, [userId, token]);
   
   const handleLogout = async () => {
-    await logout();  // Realiza la acción de logout.
-    // Restablece el stack de navegación y navega a la pantalla inicial.
-    navigation.dispatch(
-      StackActions.replace('Home')  // Usa StackActions.replace si está disponible.
-    );
+    await logout();  
+    setUserId(null);  
+    setUserData(null);  
+    setLoading(true);  
+    navigation.dispatch(StackActions.replace('Home'));  
   };
+  
 
   return (
     <View style={styles.container}>

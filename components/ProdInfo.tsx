@@ -32,6 +32,7 @@ const ProdInfo: React.FC<Props> = ({ navigation, route }) => {
   const [userId, setUserId] = useState<string | null>(null);
   const token = useToken();  // Token fetched using custom hook
   const [userData, setUserData] = useState<UserData | null>(null);
+  const [cartItems, setCartItems] = useState<Product[]>([]); // Estado para almacenar los elementos del carrito
 
   const toggleWishlist = async (item: Product) => {
     try {
@@ -59,6 +60,7 @@ const ProdInfo: React.FC<Props> = ({ navigation, route }) => {
       items.push(item);
       await AsyncStorage.setItem('cartItems', JSON.stringify(items));
       setKey(Date.now().toString());
+      setCartItems(items); // Actualizar el estado local con los nuevos elementos del carrito
       navigation.navigate('Cart');
     } catch (error) {
       console.error('Error adding to cart: ', error);
@@ -109,6 +111,30 @@ const ProdInfo: React.FC<Props> = ({ navigation, route }) => {
       console.error('Error creating chat:', error);
     }
   };
+  const addBilling = async () => {
+    try {
+      const userId = await AsyncStorage.getItem('userId');
+      const total = cartItems.reduce((acc, curr) => acc + curr.price, 0);
+      
+      // Obtenemos la fecha actual
+      const currentDate = new Date();
+      // Formateamos la fecha como "yyyy-mm-dd"
+      const formattedDate = currentDate.toISOString().split('T')[0];
+  
+      const newBilling = {
+        total: item.price,
+        id_user: userId,
+        id_videogame: item.id,
+        date: formattedDate // Asignamos la fecha formateada
+      };
+  
+      await axios.post('http://localhost/geingeemu/public/api/bilingstore', newBilling);
+      console.log('Billing stored successfully');
+    } catch (error) {
+      console.error('Error storing billing:', error);
+    }
+  };
+  
 
   return (
     <ScrollView key={key} contentContainerStyle={styles.container}>
@@ -150,6 +176,10 @@ const ProdInfo: React.FC<Props> = ({ navigation, route }) => {
           <Ionicons name="chatbubble-ellipses-outline" size={25} onPress={createChat} />
           <Text>Start Chat</Text>
         </TouchableOpacity>
+
+        <TouchableOpacity style={styles.buyButton} onPress={addBilling}>
+        <Text style={styles.buttonText}>Buy</Text>
+      </TouchableOpacity>
 
       </View>
     </ScrollView>
@@ -220,6 +250,21 @@ const styles = StyleSheet.create({
   },
   button: {
     backgroundColor: '#e76f51',
+    paddingVertical: 12,
+    paddingHorizontal: 40,
+    borderRadius: 20,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+    marginBottom: 10,
+  },
+  buyButton: {
+    backgroundColor: '#2a9d8f',
     paddingVertical: 12,
     paddingHorizontal: 40,
     borderRadius: 20,

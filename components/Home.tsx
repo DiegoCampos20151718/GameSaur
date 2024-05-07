@@ -10,6 +10,8 @@ import { createStackNavigator } from '@react-navigation/stack';
 import Search from './Search';
 import ProdInfo from './ProdInfo';
 
+
+
 export type RootStackParamList = {
   ProdInfo: { item: Product };
 };
@@ -22,6 +24,7 @@ type JsonPlaceholder = {
   image: string;
   description: string;
   price: number;
+  type: number;
   id_user: number;
 }
 
@@ -36,7 +39,7 @@ const HomeView = ({ data }: { data: JsonPlaceholder[] }) => {
   const navigation = useNavigation();
 
   const handleSearchPress = () => {
-    navigation.navigate('Search');  // Ensure you have a 'Search' screen in your navigation stack
+    navigation.navigate('Search');  // Asegúrate de tener una pantalla 'Search' en tu stack de navegación
   };
 
   const _buildImageWithText = (imagePath: ImageSourcePropType, text: string, textP: string, onPress: () => void) => (
@@ -51,8 +54,12 @@ const HomeView = ({ data }: { data: JsonPlaceholder[] }) => {
     </TouchableOpacity>
   );
 
-  const filteredData = data.filter(item =>
-    item.name.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredGames = data.filter(item =>
+    item.type === 1 && item.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const filteredConsoles = data.filter(item =>
+    item.type === 0 && item.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -64,7 +71,7 @@ const HomeView = ({ data }: { data: JsonPlaceholder[] }) => {
             placeholder="Search"
             onChangeText={setSearchQuery}
             value={searchQuery}
-            editable={false}  // Makes the text input non-editable but still usable as part of touchable opacity
+            editable={false}
           />
         </TouchableOpacity>
 
@@ -72,10 +79,10 @@ const HomeView = ({ data }: { data: JsonPlaceholder[] }) => {
 
         <Image source={require('../assets/images/brands.png')} style={{ width: '100%', height: 100, marginTop: 20 }} />
 
-        <Text style={styles.sectionHeader}>Featured</Text>
+        <Text style={styles.sectionHeader}>Video Games</Text>
         <ScrollView horizontal={true}>
           <View style={{ flexDirection: 'row' }}>
-            {filteredData.map(item => (
+            {filteredGames.map(item => (
               <View style={{ paddingRight: 16 }} key={item.id}>
                 {_buildImageWithText(item.image, item.name, `$${item.price}`, () => {
                   navigation.navigate('ProdInfo', { item });
@@ -85,12 +92,12 @@ const HomeView = ({ data }: { data: JsonPlaceholder[] }) => {
           </View>
         </ScrollView>
 
-        <Text style={styles.sectionHeader}>Offers</Text>
+        <Text style={styles.sectionHeader}>Consoles</Text>
         <ScrollView horizontal={true}>
           <View style={{ flexDirection: 'row' }}>
-            {filteredData.map(item => (
+            {filteredConsoles.map(item => (
               <View style={{ paddingRight: 16 }} key={item.id}>
-                {_buildImageWithText(item.image, item.name, `$${item.price * 0.9}`, () => {
+                {_buildImageWithText(item.image, item.name, `$${item.price}`, () => {
                   navigation.navigate('ProdInfo', { item });
                 })}
               </View>
@@ -101,6 +108,7 @@ const HomeView = ({ data }: { data: JsonPlaceholder[] }) => {
     </View>
   );
 }
+
 
 const MainScreen = () => {
   const [data, setData] = useState<JsonPlaceholder[]>([]);

@@ -10,6 +10,7 @@ import GamesUser from './components/GamesUser';
 import Addgame from './components/Addgame';
 import ChatScreen from './components/ChatList';
 import { AuthProvider } from './components/AuthService';
+
 const Drawer = createDrawerNavigator();
 // export type RootStackParamList = {
 //   ProdInfo: { item: Product };

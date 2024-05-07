@@ -8,9 +8,9 @@ type FormData = {
   description: string;
   stock: number;
   price: number;
-  type: boolean;
-  physical: boolean;
-  digital: boolean;
+  type: number;
+  physical: string;
+  digital: string;
   image: string;
   id_user: string;
   id_category: string;
@@ -29,13 +29,8 @@ type VideoGameFormProps = {
   };
 };
 
-type Category = { id: string; name: string };
-type Genre = { id: string; name: string };
-type Platform = { id: string; name: string };
-type Brand = { id: string; name: string };
-
 const VideoGameForm: React.FC<VideoGameFormProps> = ({ route }) => {
-  const { userId } = route.params; // Now correctly typed, and TypeScript knows userId is a string
+  const { userId } = route.params;
 
   const navigation = useNavigation();
 
@@ -44,117 +39,60 @@ const VideoGameForm: React.FC<VideoGameFormProps> = ({ route }) => {
     description: '',
     stock: 0,
     price: 0,
-    type: false,
-    physical: false,
-    digital: false,
+    type: 1,
+    physical: 'false',
+    digital: 'false',
     image: '',
-    id_user: userId || '', // Initialize id_user with the userId passed through navigation
+    id_user: userId || '',
     id_category: '',
     id_genre: '',
     id_platform: '',
     id_brand: '',
   });
 
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [genres, setGenres] = useState<Genre[]>([]);
-  const [platforms, setPlatforms] = useState<Platform[]>([]);
-  const [brands, setBrands] = useState<Brand[]>([]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const responses = await Promise.all([
-          axios.get('http://localhost/geingeemu/public/api/categories'),
-          axios.get('http://localhost/geingeemu/public/api/genres'),
-          axios.get('http://localhost/geingeemu/public/api/platforms'),
-          axios.get('http://localhost/geingeemu/public/api/brands')
-        ]);
-        setCategories(responses[0].data);
-        setGenres(responses[1].data);
-        setPlatforms(responses[2].data);
-        setBrands(responses[3].data);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        Alert.alert('Error', 'Failed to fetch data from server.');
-      }
-    };
-
-    fetchData();
-  }, []);
-
-  const handleInputChange = (name: keyof FormData, value: any) => {
+  const handleInputChange = (name: keyof FormData, value: string) => {
     setFormData({ ...formData, [name]: value });
   };
 
   const handleSubmit = async () => {
-    const endpoint = formData.id_user ? `http://localhost/geingeemu/public/api/videogamestore/${formData.id_user}` : 'http://localhost/geingeemu/public/api/videogamestore';
+    console.log('Valores enviados a la API:', formData); // Agrega este console.log para imprimir los valores
     try {
-      const response = await axios.post(endpoint, formData);
-      Alert.alert('Success', 'Video game successfully submitted.');
+      const response = await axios.post('http://localhost/geingeemu/public/api/videogamestore', {
+        ...formData,
+        stock: parseInt(formData.stock, 10),
+        price: parseFloat(formData.price),
+        type: formData.type === 'true',
+        physical: formData.physical === 'true',
+        digital: formData.digital === 'true',
+      });
+
+      Alert.alert('Éxito', 'Videojuego creado correctamente');
+      // Aquí podrías redirigir a otra pantalla o hacer alguna acción adicional después de crear el videojuego
     } catch (error) {
-      console.error('Error submitting form:', error);
-      Alert.alert('Error', 'Failed to submit form.');
+      console.error('Error al crear el videojuego:', error);
+      Alert.alert('Error', 'Error al crear el videojuego');
     }
   };
 
   return (
     <ScrollView style={styles.container}>
-      <TextInput placeholder="Name" value={formData.name} onChangeText={(text) => handleInputChange('name', text)} style={styles.input} />
-      <TextInput placeholder="Description" value={formData.description} onChangeText={(text) => handleInputChange('description', text)} multiline style={styles.input} />
-      <TextInput placeholder="Stock" value={formData.stock.toString()} onChangeText={(text) => handleInputChange('stock', parseInt(text))} keyboardType="numeric" style={styles.input} />
-      <TextInput placeholder="Price" value={formData.price.toString()} onChangeText={(text) => handleInputChange('price', parseFloat(text))} keyboardType="numeric" style={styles.input} />
-      <View style={styles.switchContainer}>
-        <Text>Physical:</Text>
-        <Switch value={formData.physical} onValueChange={(value) => handleInputChange('physical', value)} />
-      </View>
-      <View style={styles.switchContainer}>
-        <Text>Digital:</Text>
-        <Switch value={formData.digital} onValueChange={(value) => handleInputChange('digital', value)} />
-      </View>
-      <View style={styles.switchContainer}>
-        <Text>Type:</Text>
-        <Switch value={formData.type} onValueChange={(value) => handleInputChange('type', value)} />
-      </View>
-      <Text style={styles.label}>Image URL:</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Image URL"
-        value={formData.image}
-        onChangeText={(text) => handleInputChange('image', text)}
-      />
-      <Text style={styles.label}>Category:</Text>
-      <Picker
-        selectedValue={formData.id_category}
-        onValueChange={(itemValue) => handleInputChange('id_category', itemValue.toString())}>
-        {categories.map((category) => (
-          <Picker.Item key={category.id} label={category.name} value={category.id} />
-        ))}
+      <TextInput placeholder="Nombre" value={formData.name} onChangeText={(text) => handleInputChange('name', text)} style={styles.input} />
+      <TextInput placeholder="Descripción" value={formData.description} onChangeText={(text) => handleInputChange('description', text)} multiline style={styles.input} />
+      <TextInput placeholder="Stock" value={formData.stock} onChangeText={(text) => handleInputChange('stock', text)} keyboardType="numeric" style={styles.input} />
+      <TextInput placeholder="Precio" value={formData.price} onChangeText={(text) => handleInputChange('price', text)} keyboardType="numeric" style={styles.input} />
+      <Picker selectedValue={formData.type} onValueChange={(value) => handleInputChange('type', value)}>
+        <Picker.Item label="Físico" value="true" />
+        <Picker.Item label="Digital" value="false" />
       </Picker>
-      <Text style={styles.label}>Genre:</Text>
-      <Picker
-        selectedValue={formData.id_genre}
-        onValueChange={(itemValue) => handleInputChange('id_genre', itemValue.toString())}>
-        {genres.map((genre) => (
-          <Picker.Item key={genre.id} label={genre.name} value={genre.id} />
-        ))}
-      </Picker>
-      <Text style={styles.label}>Platform:</Text>
-      <Picker
-        selectedValue={formData.id_platform}
-        onValueChange={(itemValue) => handleInputChange('id_platform', itemValue.toString())}>
-        {platforms.map((platform) => (
-          <Picker.Item key={platform.id} label={platform.name} value={platform.id} />
-        ))}
-      </Picker>
-      <Text style={styles.label}>Brand:</Text>
-      <Picker
-        selectedValue={formData.id_brand}
-        onValueChange={(itemValue) => handleInputChange('id_brand', itemValue.toString())}>
-        {brands.map((brand) => (
-          <Picker.Item key={brand.id} label={brand.name} value={brand.id} />
-        ))}
-      </Picker>
-      <Button title="Submit" onPress={handleSubmit} />
+      <Switch value={formData.physical === 'true'} onValueChange={(value) => handleInputChange('physical', value.toString())} />
+      <Switch value={formData.digital === 'true'} onValueChange={(value) => handleInputChange('digital', value.toString())} />
+      <TextInput placeholder="URL de la imagen" value={formData.image} onChangeText={(text) => handleInputChange('image', text)} style={styles.input} />
+      <TextInput placeholder="ID del usuario" value={formData.id_user} onChangeText={(text) => handleInputChange('id_user', text)} style={styles.input} />
+      <TextInput placeholder="ID de categoría" value={formData.id_category} onChangeText={(text) => handleInputChange('id_category', text)} style={styles.input} />
+      <TextInput placeholder="ID de género" value={formData.id_genre} onChangeText={(text) => handleInputChange('id_genre', text)} style={styles.input} />
+      <TextInput placeholder="ID de plataforma" value={formData.id_platform} onChangeText={(text) => handleInputChange('id_platform', text)} style={styles.input} />
+      <TextInput placeholder="ID de marca" value={formData.id_brand} onChangeText={(text) => handleInputChange('id_brand', text)} style={styles.input} />
+      <Button title="Crear Videojuego" onPress={handleSubmit} />
     </ScrollView>
   );
 };
@@ -170,15 +108,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginBottom: 20,
     paddingHorizontal: 10,
-  },
-  label: {
-    fontSize: 16,
-    marginBottom: 5,
-  },
-  switchContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 20,
   },
 });
 

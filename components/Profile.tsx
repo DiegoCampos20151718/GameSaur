@@ -15,7 +15,7 @@ interface UserData {
 }
 
 const Profile: React.FC = ({ navigation }) => {
-  const token = useToken();  // Token fetched using custom hook
+  const token = useToken();
   const [userId, setUserId] = useState<string | null>(null);
   const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -23,22 +23,19 @@ const Profile: React.FC = ({ navigation }) => {
 
   useEffect(() => {
     const fetchUserId = async () => {
-      const storedUserId = await AsyncStorage.getItem('userId');  // Retrieve the user ID from AsyncStorage
+      const storedUserId = await AsyncStorage.getItem('userId');
       setUserId(storedUserId);
     };
-
-    fetchUserId();  // Call the async function to fetch the user ID
+    fetchUserId();
   }, []);
 
   useEffect(() => {
-    if (!userId || !token) return; // Only proceed if both userId and token are available
+    if (!userId || !token) return;
 
     const getUserDetails = async () => {
       try {
         const response = await axios.get(`http://localhost/geingeemu/public/api/userview/${userId}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-          },
+          headers: { 'Authorization': `Bearer ${token}` },
         });
         setUserData(response.data);
         setLoading(false);
@@ -48,48 +45,33 @@ const Profile: React.FC = ({ navigation }) => {
         setLoading(false);
       }
     };
-
     getUserDetails();
-  }, [userId, token]);  // React when userId or token changes
-
-
-
-  const ViewBilings = () => {
-    navigation.navigate('Biling', { userId });
-  };
-
-  const ViewGamesStore = () => {
-    navigation.navigate('Games', { userId });
-  };
-
-  const ViewFormGame = () => {
-    navigation.navigate('Addgame', { userId });
-  };
-
+  }, [userId, token]);
 
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+    <View style={styles.container}>
       {loading ? (
-        <View style={styles.placeholder}>
-          <Text>Loading...</Text>
+        <View style={styles.loadingContainer}>
+          <Text style={styles.loadingText}>Loading...</Text>
         </View>
       ) : error ? (
-        <Text style={{ color: 'red', marginBottom: 20 }}>{error}</Text>
+        <Text style={styles.errorText}>{error}</Text>
       ) : userData ? (
-        <View style={styles.container}>
-          <Text style={{ fontSize: 24 }}>User Profile</Text>
-          <Text>Name: {userData.firstname} {userData.lastname}</Text>
-          <Text>address: {userData.address}</Text>
-          <Text>birthdate: {userData.birthdate}</Text>
-          <Text>email: {userData.email}</Text>
-          <Text>role: {userData.role}</Text>
-
-          <Button title="View Bilings" onPress={ViewBilings} color="#007bff" />
-          <Button title="View Games" onPress={ViewGamesStore} color="#007bff" />
-          <Button title="Game Form add" onPress={ViewFormGame} color="#007bff" />
+        <View style={styles.profileContainer}>
+          <Text style={styles.profileHeader}>User Profile</Text>
+          <Text style={styles.profileText}>Name: {userData.firstname} {userData.lastname}</Text>
+          <Text style={styles.profileText}>Address: {userData.address}</Text>
+          <Text style={styles.profileText}>Birthdate: {userData.birthdate}</Text>
+          <Text style={styles.profileText}>Email: {userData.email}</Text>
+          <Text style={styles.profileText}>Role: {userData.role}</Text>
+          <View style={styles.buttonContainer}>
+            <Button title="View Bilings" onPress={() => navigation.navigate('Biling', { userId })} color="#007bff" />
+            <Button title="View Games" onPress={() => navigation.navigate('Games', { userId })} color="#007bff" />
+            <Button title="Add Game Form" onPress={() => navigation.navigate('Addgame', { userId })} color="#007bff" />
+          </View>
         </View>
       ) : (
-        <Text>No user data available.</Text>
+        <Text style={styles.noDataText}>No user data available.</Text>
       )}
     </View>
   );
@@ -100,7 +82,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#121212',  // Dark background for a gaming vibe
+    backgroundColor: '#121212',
   },
   loadingContainer: {
     justifyContent: 'center',
@@ -114,12 +96,13 @@ const styles = StyleSheet.create({
   errorText: {
     color: 'red',
     marginBottom: 20,
+    fontSize: 18,
   },
   profileContainer: {
     padding: 20,
-    backgroundColor: '#242424',  // Slightly lighter background for content cards
+    backgroundColor: '#242424',
     borderRadius: 10,
-    width: '90%',  // Use a percentage of width for better responsiveness
+    width: '90%',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
@@ -127,7 +110,7 @@ const styles = StyleSheet.create({
   },
   profileHeader: {
     fontSize: 24,
-    color: '#00ff00',  // Bright accent color
+    color: '#00ff00',
     marginBottom: 10,
   },
   profileText: {

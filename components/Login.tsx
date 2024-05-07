@@ -29,12 +29,13 @@ const LoginScreen = ({ navigation }) => {
           password: password,
         }),
       });
-      // const json = await response.json();
-      // console.log(json.token);
-      // if (json.success) {
-      //   await AsyncStorage.setItem('userToken', json.token);  // Asumiendo que la API devuelve un 'token'
+      const json = await response.json();
+      console.log(json.data);
+      //  if (json.success) {
+      await AsyncStorage.setItem('userId', json.data.id);  // Asumiendo que la API devuelve un 'token'
         
-        navigation.navigate('Home');
+        navigation.navigate('Profile');
+      //  }
       // } else {
       //   Alert.alert('Login Failed', json.message || 'Invalid credentials');
       // }

@@ -42,7 +42,7 @@ const HomeView = ({ data }: { data: JsonPlaceholder[] }) => {
   const _buildImageWithText = (imagePath: ImageSourcePropType, text: string, textP: string, onPress: () => void) => (
     <TouchableOpacity onPress={onPress}>
       <View style={styles.imageContainer}>
-        <Image source={`http://localhost/geingeemu/public/${imagePath}`} style={styles.image} />
+        <Image source={imagePath} style={styles.image} />
         <View style={styles.textContainer}>
           <Text style={styles.productName} numberOfLines={2} ellipsizeMode="tail">{text}</Text>
           <Text style={styles.price}>{textP.length > 8 ? textP.substring(0, 8) : textP}</Text>

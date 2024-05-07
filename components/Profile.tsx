@@ -53,11 +53,19 @@ const Profile: React.FC = ({ }) => {
   }, [userId, token]);
   
   const handleLogout = async () => {
+<<<<<<< HEAD
     await logout();  
     setUserId(null);  
     setUserData(null);  
     setLoading(true);  
     navigation.dispatch(StackActions.replace('Home'));  
+=======
+    await logout();  // Realiza la acción de logout.
+    await AsyncStorage.clear();
+    navigation.dispatch(
+      StackActions.replace('Home')  // Usa StackActions.replace si está disponible.
+    );
+>>>>>>> aaa47f67129540f20723440a8ba7adc7bdff911e
   };
   
 

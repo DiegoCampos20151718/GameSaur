@@ -70,9 +70,9 @@ const ProdInfo: React.FC<Props> = ({ navigation, route }) => {
       const storedUserId = await AsyncStorage.getItem('userId');
       console.log("Stored UserID:", storedUserId);
       if (storedUserId !== null) {
-        setUserId(storedUserId);  // Actualizar userId en el estado
+        setUserId(storedUserId);
         console.log("Updating userId to:", storedUserId);
-        // Hacer la llamada API después de actualizar el estado
+        
         const response = await axios.get(`http://localhost/geingeemu/public/api/userview/${storedUserId}`, {
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -82,8 +82,8 @@ const ProdInfo: React.FC<Props> = ({ navigation, route }) => {
         console.log(response.data.firstname);
       }
     };
-    fetchUserId();  // Llamar a la función para obtener el userId y hacer la llamada API
-  }, [token]); // Añadir 'token' como dependencia si es necesario para refetch cuando token cambia
+    fetchUserId();
+  }, [token]);
 
 
   const createChat = async () => {

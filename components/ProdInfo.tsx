@@ -30,9 +30,9 @@ const ProdInfo: React.FC<Props> = ({ navigation, route }) => {
   const [key, setKey] = useState(Date.now().toString());
   const [isInWishlist, setIsInWishlist] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
-  const token = useToken();  // Token fetched using custom hook
+  const token = useToken(); 
   const [userData, setUserData] = useState<UserData | null>(null);
-  const [cartItems, setCartItems] = useState<Product[]>([]); // Estado para almacenar los elementos del carrito
+  const [cartItems, setCartItems] = useState<Product[]>([]);
 
   const toggleWishlist = async (item: Product) => {
     try {
@@ -60,7 +60,7 @@ const ProdInfo: React.FC<Props> = ({ navigation, route }) => {
       items.push(item);
       await AsyncStorage.setItem('cartItems', JSON.stringify(items));
       setKey(Date.now().toString());
-      setCartItems(items); // Actualizar el estado local con los nuevos elementos del carrito
+      setCartItems(items);
       navigation.navigate('Cart');
     } catch (error) {
       console.error('Error adding to cart: ', error);
@@ -75,7 +75,7 @@ const ProdInfo: React.FC<Props> = ({ navigation, route }) => {
         setUserId(storedUserId);
         console.log("Updating userId to:", storedUserId);
         
-        const response = await axios.get(`http://localhost/geingeemu/public/api/userview/${storedUserId}`, {
+        const response = await axios.get(`http://192.168.76.127/geingeemu/public/api/userview/${storedUserId}`, {
           headers: {
             'Authorization': `Bearer ${token}`,
           },
@@ -99,14 +99,10 @@ const ProdInfo: React.FC<Props> = ({ navigation, route }) => {
         // date: new Date().toISOString(),
       };
 
-      // Enviar la solicitud para crear el nuevo chat
-      await axios.post('http://localhost/geingeemu/public/api/newchat', newChat);
+      await axios.post('http://192.168.76.127/geingeemu/public/api/newchat', newChat);
 
-      // Actualizar el estado local o realizar cualquier otra acción necesaria
 
-      // Refrescar la pantalla o navegar a otra pantalla si es necesario
       setKey(Date.now().toString());
-      // navigation.navigate('ChatList'); // Por ejemplo, navegamos a la lista de chats después de crear uno nuevo
     } catch (error) {
       console.error('Error creating chat:', error);
     }
@@ -116,19 +112,18 @@ const ProdInfo: React.FC<Props> = ({ navigation, route }) => {
       const userId = await AsyncStorage.getItem('userId');
       const total = cartItems.reduce((acc, curr) => acc + curr.price, 0);
       
-      // Obtenemos la fecha actual
       const currentDate = new Date();
-      // Formateamos la fecha como "yyyy-mm-dd"
+
       const formattedDate = currentDate.toISOString().split('T')[0];
   
       const newBilling = {
         total: item.price,
         id_user: userId,
         id_videogame: item.id,
-        date: formattedDate // Asignamos la fecha formateada
+        date: formattedDate 
       };
   
-      await axios.post('http://localhost/geingeemu/public/api/bilingstore', newBilling);
+      await axios.post('http://192.168.76.127/geingeemu/public/api/bilingstore', newBilling);
       console.log('Billing stored successfully');
     } catch (error) {
       console.error('Error storing billing:', error);
@@ -152,7 +147,7 @@ const ProdInfo: React.FC<Props> = ({ navigation, route }) => {
       </View>
 
       <View style={styles.imageContainer}>
-        <Image source={item.image} style={styles.image} />
+        <Image source={{uri: item.image}} style={styles.image} />
       </View>
 
       <View style={styles.descriptionContainer}>

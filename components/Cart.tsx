@@ -49,19 +49,19 @@ const CartView: React.FC = () => {
       const userId = await AsyncStorage.getItem('userId');
       const total = cartItems.reduce((acc, curr) => acc + curr.price, 0);
       
-      // Obtenemos la fecha actual
+      
       const currentDate = new Date();
-      // Formateamos la fecha como "yyyy-mm-dd"
+      
       const formattedDate = currentDate.toISOString().split('T')[0];
   
       const newBilling = {
         total,
         id_user: userId,
         id_videogame: item.id,
-        date: formattedDate // Asignamos la fecha formateada
+        date: formattedDate
       };
   
-      await axios.post('http://localhost/geingeemu/public/api/bilingstore', newBilling);
+      await axios.post('http://192.168.76.127/geingeemu/public/api/bilingstore', newBilling);
       console.log('Billing stored successfully');
     } catch (error) {
       console.error('Error storing billing:', error);

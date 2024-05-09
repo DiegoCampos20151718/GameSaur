@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, Switch, ScrollView, Picker, StyleSheet, Alert } from 'react-native';
+import { View, Text, TextInput, Button, Switch, ScrollView, StyleSheet, Alert } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
 import axios from 'axios';
 import { useNavigation, useRoute } from '@react-navigation/native';
 
@@ -64,10 +65,10 @@ const VideoGameForm: React.FC<VideoGameFormProps> = ({ route }) => {
     const fetchData = async () => {
       try {
         const responses = await Promise.all([
-          axios.get('http://localhost/geingeemu/public/api/categories'),
-          axios.get('http://localhost/geingeemu/public/api/genres'),
-          axios.get('http://localhost/geingeemu/public/api/platforms'),
-          axios.get('http://localhost/geingeemu/public/api/brands')
+          axios.get('http://192.168.76.127/geingeemu/public/api/categories'),
+          axios.get('http://192.168.76.127/geingeemu/public/api/genres'),
+          axios.get('http://192.168.76.127/geingeemu/public/api/platforms'),
+          axios.get('http://192.168.76.127/geingeemu/public/api/brands')
         ]);
         setCategories(responses[0].data);
         setGenres(responses[1].data);
@@ -91,9 +92,9 @@ const VideoGameForm: React.FC<VideoGameFormProps> = ({ route }) => {
   };
 
   const handleSubmit = async () => {
-    console.log('Valores enviados a la API:', formData); // Agrega este console.log para imprimir los valores
+    console.log('Valores enviados a la API:', formData); 
     try {
-      const response = await axios.post('http://localhost/geingeemu/public/api/videogamestore', {
+      const response = await axios.post('http://192.168.76.127/geingeemu/public/api/videogamestore', {
         ...formData,
         stock: parseInt(formData.stock, 10),
         price: parseFloat(formData.price),
@@ -103,7 +104,7 @@ const VideoGameForm: React.FC<VideoGameFormProps> = ({ route }) => {
       });
 
       Alert.alert('Éxito', 'Videojuego creado correctamente');
-      // Aquí podrías redirigir a otra pantalla o hacer alguna acción adicional después de crear el videojuego
+      
     } catch (error) {
       console.error('Error al crear el videojuego:', error);
       Alert.alert('Error', 'Error al crear el videojuego');

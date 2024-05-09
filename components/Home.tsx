@@ -9,6 +9,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createStackNavigator } from '@react-navigation/stack';
 import Search from './Search';
 import ProdInfo from './ProdInfo';
+import AddGame from './Addgame';
 
 
 
@@ -30,7 +31,7 @@ type JsonPlaceholder = {
 
 const fetchData = async () => {
   // await AsyncStorage.clear();
-  const response = await fetch('http://localhost/geingeemu/public/api/videogame_index');
+  const response = await fetch('http://192.168.76.127/geingeemu/public/api/videogame_index');
   return await response.json();
 }
 
@@ -39,13 +40,13 @@ const HomeView = ({ data }: { data: JsonPlaceholder[] }) => {
   const navigation = useNavigation();
 
   const handleSearchPress = () => {
-    navigation.navigate('Search');  // Asegúrate de tener una pantalla 'Search' en tu stack de navegación
+    navigation.navigate('Search'); 
   };
 
   const _buildImageWithText = (imagePath: ImageSourcePropType, text: string, textP: string, onPress: () => void) => (
     <TouchableOpacity onPress={onPress}>
       <View style={styles.imageContainer}>
-        <Image source={imagePath} style={styles.image} />
+        <Image source={{ uri: imagePath }} style={styles.image} />
         <View style={styles.textContainer}>
           <Text style={styles.productName} numberOfLines={2} ellipsizeMode="tail">{text}</Text>
           <Text style={styles.price}>{textP.length > 8 ? textP.substring(0, 8) : textP}</Text>
@@ -113,19 +114,23 @@ const HomeView = ({ data }: { data: JsonPlaceholder[] }) => {
 const MainScreen = () => {
   const [data, setData] = useState<JsonPlaceholder[]>([]);
   const [role, setRole] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchData().then(setData);
   }, []);
 
   useEffect(() => {
-    const fetchUserRole = async () => {
+    const fetchUserData = async () => {
       const storedUserRole = await AsyncStorage.getItem('role');
       if (storedUserRole == 1) {
         setRole(true);
       }
+      const storedUserId = await AsyncStorage.getItem('userId');
+      setUserId(storedUserId);
+      console.log("Stored UserID:", userId);
     };
-    fetchUserRole();
+    fetchUserData();
   }, []);
 
   const Tab = createBottomTabNavigator();
@@ -159,10 +164,10 @@ const MainScreen = () => {
           ),
         }}
       />
-      {role ? (
+      {/* {role ? (
         <Tab.Screen
-          name="Sell Games"
-          component={WishList}  // Assume this component similarly needs data
+          name="Sell Products"
+          component={AddGame}
           options={{
             tabBarIcon: ({ color, size }) => (
               <Ionicons name="pricetag" color={color} size={25} />
@@ -171,7 +176,7 @@ const MainScreen = () => {
         />
       ) :
         <></>
-      }
+      } */}
     </Tab.Navigator>
   );
 }

@@ -21,11 +21,11 @@ interface JsonPlaceholder {
 
 const deleteGame = async (game: JsonPlaceholder, setGames: React.Dispatch<React.SetStateAction<JsonPlaceholder[]>>, token: string) => {
   try {
-    await axios.delete(`http://localhost/geingeemu/public/api/destroy/${game.id}`, {
+    await axios.delete(`http://192.168.76.127/geingeemu/public/api/destroy/${game.id}`, {
       headers: { 'Authorization': `Bearer ${token}` },
     });
     Alert.alert('Game Deleted', 'The game has been successfully deleted.');
-    setGames((prevGames) => prevGames.filter(g => g.id !== game.id)); // Remove the game from the state
+    setGames((prevGames) => prevGames.filter(g => g.id !== game.id)); 
   } catch (error) {
     console.error('Delete error:', error);
     Alert.alert('Error', 'Failed to delete the game. Please try again.');
@@ -33,10 +33,10 @@ const deleteGame = async (game: JsonPlaceholder, setGames: React.Dispatch<React.
 };
 
 const fetchData = async () => {
-  const url = `http://localhost/geingeemu/public/api/videogame_index`;
+  const url = `http://192.168.76.127/geingeemu/public/api/videogame_index`;
   const response = await fetch(url);
   const data = await response.json();
-  console.log("Data from API:", data);  // Verificación de los datos recibidos
+  console.log("Data from API:", data);
   return data;
 }
 
@@ -86,7 +86,7 @@ const MainScreen = () => {
             <Ionicons name="arrow-back" size={25} />
             <Text>Back</Text>
           </TouchableOpacity>
-          <Text style={styles.header}>Your Games</Text>
+          <Text style={styles.header}>Your Products</Text>
           <ScrollView contentContainerStyle={styles.gamesContainer}>
             {games.filter(game => game.id_user === parseInt(userId, 10)).length > 0 ? 
               games.filter(game => game.id_user === parseInt(userId, 10)).map(game => renderGameItem(game, 'YOUR_TOKEN_HERE')) : 

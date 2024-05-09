@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, Switch, ScrollView, Picker, StyleSheet, Alert, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, Button, Switch, ScrollView, StyleSheet, Alert, TouchableOpacity } from 'react-native';
 import axios from 'axios';
+import { Picker } from '@react-native-picker/picker';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type FormData = {
     name: string;
@@ -17,6 +19,7 @@ type FormData = {
     id_genre: string;
     id_platform: string;
     id_brand: string;
+    id_user: string;
 };
 
 type VideoGameEditScreenRouteParams = {
@@ -36,6 +39,14 @@ type Brand = { id: string; name: string };
 
 const VideoGameEdit: React.FC<VideoGameEditProps> = ({ navigation, route }) => {
     const { gameId } = route.params;
+    const [userId, setUserId] = useState<string | null>(null);
+
+    const fetchUserId = async () => {
+        const storedUserId = await AsyncStorage.getItem('userId');
+        setUserId(storedUserId);
+    };
+    console.log("Stored UserID:", userId);
+    fetchUserId();
 
     const [formData, setFormData] = useState<FormData>({
         name: '',
@@ -50,6 +61,7 @@ const VideoGameEdit: React.FC<VideoGameEditProps> = ({ navigation, route }) => {
         id_genre: '',
         id_platform: '',
         id_brand: '',
+        id_user: '',
     });
 
     const [categories, setCategories] = useState<Category[]>([]);
@@ -61,11 +73,11 @@ const VideoGameEdit: React.FC<VideoGameEditProps> = ({ navigation, route }) => {
         const fetchData = async () => {
             try {
                 const responses = await Promise.all([
-                    axios.get('http://localhost/geingeemu/public/api/categories'),
-                    axios.get('http://localhost/geingeemu/public/api/genres'),
-                    axios.get('http://localhost/geingeemu/public/api/platforms'),
-                    axios.get('http://localhost/geingeemu/public/api/brands'),
-                    axios.get(`http://localhost/geingeemu/public/api/ampp/${gameId}`),
+                    axios.get('http://192.168.76.127/geingeemu/public/api/categories'),
+                    axios.get('http://192.168.76.127/geingeemu/public/api/genres'),
+                    axios.get('http://192.168.76.127/geingeemu/public/api/platforms'),
+                    axios.get('http://192.168.76.127/geingeemu/public/api/brands'),
+                    axios.get(`http://192.168.76.127/geingeemu/public/api/ampp/${gameId}`),
                 ]);
                 setCategories(responses[0].data);
                 setGenres(responses[1].data);
@@ -85,6 +97,7 @@ const VideoGameEdit: React.FC<VideoGameEditProps> = ({ navigation, route }) => {
                     id_genre: videoGameData.id_genre.toString(),
                     id_platform: videoGameData.id_platform.toString(),
                     id_brand: videoGameData.id_brand.toString(),
+                    id_user: videoGameData.id_user.toString(),
                 });
             } catch (error) {
                 console.error('Error fetching data:', error);
@@ -100,8 +113,8 @@ const VideoGameEdit: React.FC<VideoGameEditProps> = ({ navigation, route }) => {
 
     const handleSubmit = async () => {
         try {
-            console.log('Datos enviados al servidor:', formData); // Añadir este console.log
-            await axios.post(`http://localhost/geingeemu/public/api/videogameedit/${gameId}`, formData);
+            console.log('Datos enviados al servidor:', formData);
+            await axios.post(`http://192.168.76.127/geingeemu/public/api/videogameedit/${gameId}`, formData);
             Alert.alert('Éxito', 'Videojuego editado correctamente');
         } catch (error) {
             console.error('Error al editar el videojuego:', error);

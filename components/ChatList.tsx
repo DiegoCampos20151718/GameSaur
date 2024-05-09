@@ -39,22 +39,22 @@ const ChatList: React.FC = ({ navigation }) => {
         setUserId(storedUserId);
         if (storedUserId) {
           const userId = BigInt(storedUserId);
-          const response = await axios.get<Chat[]>(`http://localhost/geingeemu/public/api/loadchats/${userId}`, {
+          const response = await axios.get<Chat[]>(`http://192.168.76.127/geingeemu/public/api/loadchats/${userId}`, {
             headers: { 'Authorization': `Bearer ${token}` },
           });
           setChats(response.data);
 
-          // Obtener los nombres de usuario para id_user1
-          const user1Requests = response.data.map(chat => axios.get<User>(`http://localhost/geingeemu/public/api/userview/${chat.id_user1}`));
+          
+          const user1Requests = response.data.map(chat => axios.get<User>(`http://192.168.76.127/geingeemu/public/api/userview/${chat.id_user1}`));
           const usersData1 = await Promise.all(user1Requests);
           const user1Names = usersData1.map(userResponse => userResponse.data);
 
-          // Obtener los nombres de usuario para id_user2
-          const user2Requests = response.data.map(chat => axios.get<User>(`http://localhost/geingeemu/public/api/userview/${chat.id_user2}`));
+         
+          const user2Requests = response.data.map(chat => axios.get<User>(`http://192.168.76.127/geingeemu/public/api/userview/${chat.id_user2}`));
           const usersData2 = await Promise.all(user2Requests);
           const user2Names = usersData2.map(userResponse => userResponse.data);
 
-          // Combinar nombres de usuario
+         
           const combinedUsers = response.data.map((chat, index) => ({
             id: chat.id,
             firstname1: user1Names[index]?.firstname,
@@ -65,8 +65,8 @@ const ChatList: React.FC = ({ navigation }) => {
 
           setUsers(combinedUsers);
 
-          // Obtener los nombres de videojuego para id_videogame
-          const gameRequests = response.data.map(chat => axios.get<{ name: string }>(`http://localhost/geingeemu/public/api/ampp/${chat.id_videogame}`));
+          
+          const gameRequests = response.data.map(chat => axios.get<{ name: string }>(`http://192.168.76.1277/geingeemu/public/api/ampp/${chat.id_videogame}`));
           const gamesData = await Promise.all(gameRequests);
           const gameNames = gamesData.reduce((acc, gameResponse) => {
             acc[gameResponse.data.id] = gameResponse.data.name;

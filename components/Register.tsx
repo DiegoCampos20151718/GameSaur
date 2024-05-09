@@ -45,7 +45,7 @@ function Register() {
       });
   
       try {
-          const response = await fetch("http://localhost/geingeemu/public/api/register", {
+          const response = await fetch("http://192.168.76.127/geingeemu/public/api/register", {
               method: 'POST',
               body: formData,
               headers: {
@@ -53,7 +53,7 @@ function Register() {
               }
           });
           
-          const textResponse = await response.text(); // Get response as text
+          const textResponse = await response.text();
           console.log("Raw response:", textResponse);
   
           try {

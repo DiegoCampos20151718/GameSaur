@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from './AuthService';  // Importa useAuth para acceder a logout
+import { useAuth } from './AuthService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { Button, View, Text, StyleSheet } from 'react-native';
@@ -19,16 +19,22 @@ interface UserData {
 
 const Profile: React.FC = ({ }) => {
   const navigation = useNavigation();
-  const { token, logout } = useAuth();  
+  const { token, logout } = useAuth();
   const [userId, setUserId] = useState<string | null>(null);
   const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [role, setRole] = useState(false);
 
   useEffect(() => {
     const fetchUserId = async () => {
       const storedUserId = await AsyncStorage.getItem('userId');
       setUserId(storedUserId);
+      const storedUserRole = await AsyncStorage.getItem('role');
+      if (storedUserRole == 1) {
+        setRole(true);
+        console.log(role);
+      }
     };
     fetchUserId();
   }, []);
@@ -38,7 +44,7 @@ const Profile: React.FC = ({ }) => {
 
     const getUserDetails = async () => {
       try {
-        const response = await axios.get(`http://localhost/geingeemu/public/api/userview/${userId}`, {
+        const response = await axios.get(`http://192.168.76.127/geingeemu/public/api/userview/${userId}`, {
           headers: { 'Authorization': `Bearer ${token}` },
         });
         setUserData(response.data);
@@ -51,15 +57,16 @@ const Profile: React.FC = ({ }) => {
     };
     getUserDetails();
   }, [userId, token]);
-  
+
   const handleLogout = async () => {
-    await logout();  
-    setUserId(null);  
-    setUserData(null);  
-    setLoading(true);  
-    navigation.dispatch(StackActions.replace('Home'));  
+    await logout();
+    setUserId(null);
+    setUserData(null);
+    setLoading(true);
+    await AsyncStorage.clear();
+    navigation.dispatch(StackActions.replace('Home'));
   };
-  
+
 
   return (
     <View style={styles.container}>
@@ -79,8 +86,12 @@ const Profile: React.FC = ({ }) => {
           <Text style={styles.profileText}>Role: {userData.role}</Text>
           <View style={styles.buttonContainer}>
             <Button title="View Bilings" onPress={() => navigation.navigate('Biling', { userId })} color="#007bff" />
-            <Button title="View Games" onPress={() => navigation.navigate('Games', { userId })} color="#007bff" />
-            <Button title="Add Game Form" onPress={() => navigation.navigate('Addgame', { userId })} color="#007bff" />
+            <Button title="View Products" onPress={() => navigation.navigate('Games', { userId })} color="#007bff" />
+            {role ? (
+              <Button title="Add Product Form" onPress={() => navigation.navigate('Addgame', { userId })} color="#007bff" />
+            ) :
+              <></>
+            }
             <Button title="Log out" onPress={handleLogout} color="#007bff" />
           </View>
         </View>

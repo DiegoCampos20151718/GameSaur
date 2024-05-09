@@ -4,7 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface wishItems {
   name: string;
-  image: any; // Utiliza el tipo adecuado para las imágenes
+  image: any;
   price: number;
 }
 

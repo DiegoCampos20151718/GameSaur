@@ -25,35 +25,36 @@ const LoginScreen = ({ navigation }) => {
     }
     setLoading(true);
     try {
-      const response = await fetch('http://localhost/geingeemu/public/api/login', {
+      const response = await fetch('http://192.168.76.127/geingeemu/public/api/login', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify({
           email: email,
           password: password,
         }),
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
       });
-
+      
       const json = await response.json();
       if (!response.ok) {
         Alert.alert('Login Error', `Server responded with status: ${response.status}`);
         return;
       }
-      await AsyncStorage.setItem('authToken', json.token);
+      await AsyncStorage.setItem('authToken', json.data.token);
       login(json.data.token);
       const id = json.data.id;
       await AsyncStorage.setItem('userId', id.toString());
       const role = json.data.role;
-      await AsyncStorage.setItem('role', role);
+      await AsyncStorage.setItem('role', role.toString());
       console.log(json.data);
+      console.log('hola');
       navigation.navigate('Profile', { id });
     } catch (error) {
       Alert.alert('Login Error', 'Unable to connect to the server');
-    } finally {
-      setLoading(false);
     }
+    setLoading(false);
   };
 
   return (

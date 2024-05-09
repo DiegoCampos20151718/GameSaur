@@ -12,7 +12,7 @@ type JsonPlaceholder = {
 }
 
 const fetchData = async () => {
-  const response = await fetch('http://localhost/geingeemu/public/api/videogame_index');
+  const response = await fetch('http://192.168.76.127/geingeemu/public/api/videogame_index');
   return await response.json();
 }
 
@@ -44,7 +44,7 @@ const SearchView = ({ data }: { data: JsonPlaceholder[] }) => {
           <Text>Go back</Text>
         </TouchableOpacity>
         <TextInput
-          style={[styles.searchInput, { marginLeft: 10 }]} // Added marginLeft to create space between the button and input
+          style={[styles.searchInput, { marginLeft: 10 }]}
           placeholder="Search"
           onChangeText={setSearchQuery}
           value={searchQuery}

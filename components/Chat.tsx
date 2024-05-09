@@ -17,13 +17,13 @@ const ChatDetailScreen: React.FC<{ route: any }> = ({ navigation, route }) => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [userId, setUserId] = useState<string | null>(null);
-  const token = useToken();  // Token fetched using custom hook
+  const token = useToken(); 
   const [userData, setUserData] = useState<UserData | null>(null);
 
   useEffect(() => {
     const fetchMessages = async () => {
       try {
-        const response = await axios.get<{ chat: string }[]>(`http://localhost/geingeemu/public/api/loadmessages/${chatId}`);
+        const response = await axios.get<{ chat: string }[]>(`http://192.168.76.127/geingeemu/public/api/loadmessages/${chatId}`);
         if (response.data.length > 0) {
           const chatData = response.data[0].chat;
           const parsedChatData: ChatMessage[] = JSON.parse(chatData);
@@ -40,9 +40,9 @@ const ChatDetailScreen: React.FC<{ route: any }> = ({ navigation, route }) => {
   useEffect(() => {
     const fetchUserId = async () => {
         const storedUserId = await AsyncStorage.getItem('userId');
-        console.log("Stored UserID:", storedUserId);  // Verificación del userId recuperado
+        console.log("Stored UserID:", storedUserId); 
         setUserId(storedUserId);
-        const response = await axios.get(`http://localhost/geingeemu/public/api/userview/${storedUserId}`, {
+        const response = await axios.get(`http://192.168.76.127/geingeemu/public/api/userview/${storedUserId}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -57,7 +57,7 @@ const ChatDetailScreen: React.FC<{ route: any }> = ({ navigation, route }) => {
   const handleSend = async () => {
     try {
       const newMessageData: ChatMessage = {
-        name: userData, // Establecer el nombre del usuario que envía el mensaje
+        name: userData,
         message: newMessage,
         date: new Date().toISOString(),
       };
@@ -65,7 +65,7 @@ const ChatDetailScreen: React.FC<{ route: any }> = ({ navigation, route }) => {
       const updatedMessages = [...messages, newMessageData];
       setMessages(updatedMessages);
 
-      await axios.post(`http://localhost/geingeemu/public/api/updatemessages/${chatId}`, { chat: JSON.stringify(updatedMessages) });
+      await axios.post(`http://192.168.76.127/geingeemu/public/api/updatemessages/${chatId}`, { chat: JSON.stringify(updatedMessages) });
 
       setNewMessage('');
     } catch (error) {

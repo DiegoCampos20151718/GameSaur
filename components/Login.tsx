@@ -25,7 +25,7 @@ const LoginScreen = ({ navigation }) => {
     }
     setLoading(true);
     try {
-      const response = await fetch('http://192.168.76.127/geingeemu/public/api/login', {
+      const response = await fetch('http://localhost/geingeemu/public/api/login', {
         method: 'POST',
         body: JSON.stringify({
           email: email,

@@ -54,10 +54,10 @@ const Biling: React.FC = ({ navigation }) => {
       if (!userId || !token) return;
 
       try {
-        const userD = axios.get(`http://192.168.76.127/geingeemu/public/api/userview/${userId}`, {
+        const userD = axios.get(`http://localhost/geingeemu/public/api/userview/${userId}`, {
           headers: { 'Authorization': `Bearer ${token}` },
         });
-        const bilingD = axios.get(`http://192.168.76.127/geingeemu/public/api/bilingview/${userId}`, {
+        const bilingD = axios.get(`http://localhost/geingeemu/public/api/bilingview/${userId}`, {
           headers: { 'Authorization': `Bearer ${token}` },
         });
 
@@ -65,7 +65,7 @@ const Biling: React.FC = ({ navigation }) => {
         setUserData(userResponse.data);
         setBilingData(bilingResponse.data);
         if (bilingResponse.data.id_videogame) {
-          const videoGD = await axios.get(`http://192.168.76.127/geingeemu/public/api/videogameview/${bilingResponse.data.id_videogame}`, {
+          const videoGD = await axios.get(`http://localhost/geingeemu/public/api/videogameview/${bilingResponse.data.id_videogame}`, {
             headers: { 'Authorization': `Bearer ${token}` },
           });
           setVideoData(videoGD.data);

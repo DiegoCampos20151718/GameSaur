@@ -21,7 +21,7 @@ interface JsonPlaceholder {
 
 const deleteGame = async (game: JsonPlaceholder, setGames: React.Dispatch<React.SetStateAction<JsonPlaceholder[]>>, token: string) => {
   try {
-    await axios.delete(`http://192.168.76.127/geingeemu/public/api/destroy/${game.id}`, {
+    await axios.delete(`http://localhost/geingeemu/public/api/destroy/${game.id}`, {
       headers: { 'Authorization': `Bearer ${token}` },
     });
     Alert.alert('Game Deleted', 'The game has been successfully deleted.');
@@ -33,7 +33,7 @@ const deleteGame = async (game: JsonPlaceholder, setGames: React.Dispatch<React.
 };
 
 const fetchData = async () => {
-  const url = `http://192.168.76.127/geingeemu/public/api/videogame_index`;
+  const url = `http://localhost/geingeemu/public/api/videogame_index`;
   const response = await fetch(url);
   const data = await response.json();
   console.log("Data from API:", data);
@@ -83,7 +83,7 @@ const MainScreen = () => {
       {userId && 
         <View style={styles.container}>
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.goBack}>
-            <Ionicons name="arrow-back" size={25} />
+            <Ionicons name="arrow-undo-sharp" size={25} />
             <Text>Back</Text>
           </TouchableOpacity>
           <Text style={styles.header}>Your Products</Text>
@@ -118,12 +118,23 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   gameItem: {
-    marginBottom: 16,
-    alignItems: 'center',
+    backgroundColor: '#ffffff',
+    borderRadius: 8,
+    padding: 16,
+    marginTop: 16,
+    marginHorizontal: 16,
+    shadowColor: '#000000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+    width: '100%',
   },
   image: {
-    width: '100%',
-    height: 200,
+    height: 450,
   },
   name: {
     fontSize: 20,

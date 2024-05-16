@@ -44,7 +44,7 @@ const Profile: React.FC = ({ }) => {
 
     const getUserDetails = async () => {
       try {
-        const response = await axios.get(`http://192.168.76.127/geingeemu/public/api/userview/${userId}`, {
+        const response = await axios.get(`http://localhost/geingeemu/public/api/userview/${userId}`, {
           headers: { 'Authorization': `Bearer ${token}` },
         });
         setUserData(response.data);

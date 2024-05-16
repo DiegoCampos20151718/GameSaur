@@ -12,7 +12,7 @@ type JsonPlaceholder = {
 }
 
 const fetchData = async () => {
-  const response = await fetch('http://192.168.76.127/geingeemu/public/api/videogame_index');
+  const response = await fetch('http://localhost/geingeemu/public/api/videogame_index');
   return await response.json();
 }
 

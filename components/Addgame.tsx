@@ -65,10 +65,10 @@ const VideoGameForm: React.FC<VideoGameFormProps> = ({ route }) => {
     const fetchData = async () => {
       try {
         const responses = await Promise.all([
-          axios.get('http://192.168.76.127/geingeemu/public/api/categories'),
-          axios.get('http://192.168.76.127/geingeemu/public/api/genres'),
-          axios.get('http://192.168.76.127/geingeemu/public/api/platforms'),
-          axios.get('http://192.168.76.127/geingeemu/public/api/brands')
+          axios.get('http://localhost/geingeemu/public/api/categories'),
+          axios.get('http://localhost/geingeemu/public/api/genres'),
+          axios.get('http://localhost/geingeemu/public/api/platforms'),
+          axios.get('http://localhost/geingeemu/public/api/brands')
         ]);
         setCategories(responses[0].data);
         setGenres(responses[1].data);
@@ -94,7 +94,7 @@ const VideoGameForm: React.FC<VideoGameFormProps> = ({ route }) => {
   const handleSubmit = async () => {
     console.log('Valores enviados a la API:', formData); 
     try {
-      const response = await axios.post('http://192.168.76.127/geingeemu/public/api/videogamestore', {
+      const response = await axios.post('http://localhost/geingeemu/public/api/videogamestore', {
         ...formData,
         stock: parseInt(formData.stock, 10),
         price: parseFloat(formData.price),
@@ -117,7 +117,7 @@ const VideoGameForm: React.FC<VideoGameFormProps> = ({ route }) => {
       <TextInput placeholder="Description" value={formData.description} onChangeText={(text) => handleInputChange('description', text)} multiline style={styles.input} />
       <TextInput placeholder="Stock" value={formData.stock} onChangeText={(text) => handleInputChange('stock', text)} keyboardType="numeric" style={styles.input} />
       <TextInput placeholder="Price" value={formData.price} onChangeText={(text) => handleInputChange('price', text)} keyboardType="numeric" style={styles.input} />
-      <Picker selectedValue={formData.type} onValueChange={(value) => handleInputChange('type', value)}>
+      <Picker selectedValue={formData.type} onValueChange={(value) => handleInputChange('type', value)} style={styles.input}>
         <Picker.Item label="Videogame" value="true" />
         <Picker.Item label="Console" value="false" />
       </Picker>
@@ -131,7 +131,7 @@ const VideoGameForm: React.FC<VideoGameFormProps> = ({ route }) => {
       {/* <TextInput placeholder="ID del usuario" value={formData.id_user} onChangeText={(text) => handleInputChange('id_user', text)} style={styles.input} /> */}
       <Picker
         selectedValue={formData.id_category}
-        onValueChange={(value) => handleInputChange('id_category', value.toString())}>
+        onValueChange={(value) => handleInputChange('id_category', value.toString())} style={styles.input}>
         {categories.map((category) => (
           <Picker.Item key={category.id} label={category.name} value={category.id} />
         ))}
@@ -139,7 +139,7 @@ const VideoGameForm: React.FC<VideoGameFormProps> = ({ route }) => {
       <Text>Genre:</Text>
       <Picker
         selectedValue={formData.id_genre}
-        onValueChange={(value) => handleInputChange('id_genre', value.toString())}>
+        onValueChange={(value) => handleInputChange('id_genre', value.toString())} style={styles.input}>
         {genres.map((genre) => (
           <Picker.Item key={genre.id} label={genre.name} value={genre.id} />
         ))}
@@ -147,7 +147,7 @@ const VideoGameForm: React.FC<VideoGameFormProps> = ({ route }) => {
       <Text>Platform:</Text>
       <Picker
         selectedValue={formData.id_platform}
-        onValueChange={(value) => handleInputChange('id_platform', value.toString())}>
+        onValueChange={(value) => handleInputChange('id_platform', value.toString())} style={styles.input}>
         {platforms.map((platform) => (
           <Picker.Item key={platform.id} label={platform.name} value={platform.id} />
         ))}
@@ -155,12 +155,12 @@ const VideoGameForm: React.FC<VideoGameFormProps> = ({ route }) => {
       <Text>Brand:</Text>
       <Picker
         selectedValue={formData.id_brand}
-        onValueChange={(value) => handleInputChange('id_brand', value.toString())}>
+        onValueChange={(value) => handleInputChange('id_brand', value.toString())} style={styles.input}>
         {brands.map((brand) => (
           <Picker.Item key={brand.id} label={brand.name} value={brand.id} />
         ))}
       </Picker>
-      <Button title="Crear Videojuego" onPress={handleSubmit} />
+      <Button title="Add Product" onPress={handleSubmit} />
     </ScrollView>
   );
 };
@@ -171,11 +171,14 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   input: {
-    height: 40,
-    borderColor: 'gray',
-    borderWidth: 1,
+    width: '100%',
+    height: 50,
+    borderColor: '#007AFF',
+    borderWidth: 2,
+    borderRadius: 10,
+    paddingHorizontal: 15,
     marginBottom: 20,
-    paddingHorizontal: 10,
+    fontSize: 18,
   },
 });
 

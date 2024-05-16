@@ -75,7 +75,7 @@ const ProdInfo: React.FC<Props> = ({ navigation, route }) => {
         setUserId(storedUserId);
         console.log("Updating userId to:", storedUserId);
         
-        const response = await axios.get(`http://192.168.76.127/geingeemu/public/api/userview/${storedUserId}`, {
+        const response = await axios.get(`http://localhost/geingeemu/public/api/userview/${storedUserId}`, {
           headers: {
             'Authorization': `Bearer ${token}`,
           },
@@ -99,7 +99,7 @@ const ProdInfo: React.FC<Props> = ({ navigation, route }) => {
         // date: new Date().toISOString(),
       };
 
-      await axios.post('http://192.168.76.127/geingeemu/public/api/newchat', newChat);
+      await axios.post('http://localhost/geingeemu/public/api/newchat', newChat);
 
 
       setKey(Date.now().toString());
@@ -123,7 +123,7 @@ const ProdInfo: React.FC<Props> = ({ navigation, route }) => {
         date: formattedDate 
       };
   
-      await axios.post('http://192.168.76.127/geingeemu/public/api/bilingstore', newBilling);
+      await axios.post('http://localhost/geingeemu/public/api/bilingstore', newBilling);
       console.log('Billing stored successfully');
     } catch (error) {
       console.error('Error storing billing:', error);

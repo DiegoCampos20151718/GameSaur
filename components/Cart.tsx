@@ -61,7 +61,7 @@ const CartView: React.FC = () => {
         date: formattedDate
       };
   
-      await axios.post('http://192.168.76.127/geingeemu/public/api/bilingstore', newBilling);
+      await axios.post('http://localhost/geingeemu/public/api/bilingstore', newBilling);
       console.log('Billing stored successfully');
     } catch (error) {
       console.error('Error storing billing:', error);

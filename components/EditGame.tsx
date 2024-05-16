@@ -73,11 +73,11 @@ const VideoGameEdit: React.FC<VideoGameEditProps> = ({ navigation, route }) => {
         const fetchData = async () => {
             try {
                 const responses = await Promise.all([
-                    axios.get('http://192.168.76.127/geingeemu/public/api/categories'),
-                    axios.get('http://192.168.76.127/geingeemu/public/api/genres'),
-                    axios.get('http://192.168.76.127/geingeemu/public/api/platforms'),
-                    axios.get('http://192.168.76.127/geingeemu/public/api/brands'),
-                    axios.get(`http://192.168.76.127/geingeemu/public/api/ampp/${gameId}`),
+                    axios.get('http://localhost/geingeemu/public/api/categories'),
+                    axios.get('http://localhost/geingeemu/public/api/genres'),
+                    axios.get('http://localhost/geingeemu/public/api/platforms'),
+                    axios.get('http://localhost/geingeemu/public/api/brands'),
+                    axios.get(`http://localhost/geingeemu/public/api/ampp/${gameId}`),
                 ]);
                 setCategories(responses[0].data);
                 setGenres(responses[1].data);
@@ -114,7 +114,7 @@ const VideoGameEdit: React.FC<VideoGameEditProps> = ({ navigation, route }) => {
     const handleSubmit = async () => {
         try {
             console.log('Datos enviados al servidor:', formData);
-            await axios.post(`http://192.168.76.127/geingeemu/public/api/videogameedit/${gameId}`, formData);
+            await axios.post(`http://localhost/geingeemu/public/api/videogameedit/${gameId}`, formData);
             Alert.alert('Éxito', 'Videojuego editado correctamente');
         } catch (error) {
             console.error('Error al editar el videojuego:', error);
@@ -136,29 +136,29 @@ const VideoGameEdit: React.FC<VideoGameEditProps> = ({ navigation, route }) => {
             <TextInput placeholder="Description" value={formData.description} onChangeText={(text) => handleInputChange('description', text)} multiline style={styles.input} />
             <TextInput placeholder="Stock" value={formData.stock} onChangeText={(text) => handleInputChange('stock', text)} keyboardType="numeric" style={styles.input} />
             <TextInput placeholder="Price" value={formData.price} onChangeText={(text) => handleInputChange('price', text)} keyboardType="numeric" style={styles.input} />
-            <Picker selectedValue={formData.type} onValueChange={(value) => handleInputChange('type', value)}>
+            <Picker selectedValue={formData.type} onValueChange={(value) => handleInputChange('type', value)} style={styles.input}>
                 <Picker.Item label="Videogame" value="1" />
                 <Picker.Item label="Console" value="0" />
             </Picker>
             <Text>Physical: <Switch value={formData.physical === 'true'} onValueChange={(value) => handleInputChange('physical', value.toString())} /></Text>
             <Text>Digital: <Switch value={formData.digital === 'true'} onValueChange={(value) => handleInputChange('digital', value.toString())} /></Text>
             <TextInput placeholder="Image URL" value={formData.image} onChangeText={(text) => handleInputChange('image', text)} style={styles.input} />
-            <Picker selectedValue={formData.id_category} onValueChange={(value) => handleInputChange('id_category', value)}>
+            <Picker selectedValue={formData.id_category} onValueChange={(value) => handleInputChange('id_category', value)} style={styles.input}>
                 {categories.map((category) => (
                     <Picker.Item key={category.id} label={category.name} value={category.id} />
                 ))}
             </Picker>
-            <Picker selectedValue={formData.id_genre} onValueChange={(value) => handleInputChange('id_genre', value)}>
+            <Picker selectedValue={formData.id_genre} onValueChange={(value) => handleInputChange('id_genre', value)} style={styles.input}>
                 {genres.map((genre) => (
                     <Picker.Item key={genre.id} label={genre.name} value={genre.id} />
                 ))}
             </Picker>
-            <Picker selectedValue={formData.id_platform} onValueChange={(value) => handleInputChange('id_platform', value)}>
+            <Picker selectedValue={formData.id_platform} onValueChange={(value) => handleInputChange('id_platform', value)} style={styles.input}>
                 {platforms.map((platform) => (
                     <Picker.Item key={platform.id} label={platform.name} value={platform.id} />
                 ))}
             </Picker>
-            <Picker selectedValue={formData.id_brand} onValueChange={(value) => handleInputChange('id_brand', value)}>
+            <Picker selectedValue={formData.id_brand} onValueChange={(value) => handleInputChange('id_brand', value)} style={styles.input}>
                 {brands.map((brand) => (
                     <Picker.Item key={brand.id} label={brand.name} value={brand.id} />
                 ))}
@@ -174,12 +174,15 @@ const styles = StyleSheet.create({
         padding: 20,
     },
     input: {
-        height: 40,
-        borderColor: 'gray',
-        borderWidth: 1,
+        width: '100%',
+        height: 50,
+        borderColor: '#007AFF',
+        borderWidth: 2,
+        borderRadius: 10,
+        paddingHorizontal: 15,
         marginBottom: 20,
-        paddingHorizontal: 10,
-    },
+        fontSize: 18,
+      },
 });
 
 export default VideoGameEdit;

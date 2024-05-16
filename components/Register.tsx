@@ -45,7 +45,7 @@ function Register() {
       });
   
       try {
-          const response = await fetch("http://192.168.76.127/geingeemu/public/api/register", {
+          const response = await fetch("http://localhost/geingeemu/public/api/register", {
               method: 'POST',
               body: formData,
               headers: {
